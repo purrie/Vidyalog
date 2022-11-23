@@ -1,0 +1,23 @@
+#+title: Vidyalog
+
+* About
+This is a WIP program designed to make watching Youtube playlists easier. The way I use Youtube, is often focused around watching series that creators put in playlists, yet that part of Youtube is very lacking in features and has terrible UI/UX. There is no feed with new videos when they get added to a playlist, keeping track of them is also horrible as there's no way to filter them, if you save any playlist, it gets dumped into a horrendously long list of every playlist you've ever made or saved. Not to mention other usability issues. And thus, the need for a solution was born, and this program is my attempt at creating the solution for it.
+
+* Contributing
+This is an open project and contributions are welcome.
+
+* License
+Vidyalog, The video playlist manager
+Copyright (C) 2022 Purrie
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 2.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

@@ -1,0 +1,38 @@
+#+title: Task list
+
+This is a list of things that I want to include in the in the project or how I think things should work or look.
+
+* Screens
+** Home
+Here the user should be shown most relevant items. Things that you're most likely are here for when you open the program.
+
+That includes:
+- New videos feed
+- Continue watching playlists that aren't completed yet.
+
+** Playlist view
+Here the user will have the informations and controls regarding specific playlist. There will be a list of videos with buttons to open in browser, open in vlc or download. Each video can also be marked as watched.
+
+** Playlist tracker
+Here the user can add or remove playlists from the program. All tracked playlists are displayed here with numbers of how many videos have been marked as watched for each.
+
+** Playlist history
+When all videos of a playlist are marked as watched, it gets moved here from the tracker
+
+** Channel tracker
+A screen with a list of groups on the side, with ability to add more groups. In the middle, there will be a list of tracked channels with the top having ability to add more by url.
+
+Each group should have a toggle for whatever to track new videos on the home page or not for it.
+
+** Channel view
+When clicked on, a channel information will be displayed with options to assign it to a group or multiple groups. A list of recent videos will be shown, as well as a list of playlists.
+
+** Settings
+A screen for settings. I imagine there will be at least toggles and inputs for paths to vlc and youtube-dl
+
+* Additional features
+** ani-cli like functionality
+This would pretty much work like ani-cli but for youtube as is, and with graphical interface. Why not implement adding support for adding animes from streaming sites to the playlist tracker? Maybe even any show from any additional services.
+
+** Other video sites
+Odysee and Rumble among others would be neat addition. One app to watch them all.
