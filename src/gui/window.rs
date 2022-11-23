@@ -69,6 +69,10 @@ impl Application for Window {
                 }
                 Command::none()
             }
+            Message::OpenInBrowser(url) => {
+                open::that(url).unwrap();
+                Command::none()
+            },
         }
     }
 

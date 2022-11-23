@@ -12,6 +12,7 @@ pub enum Message {
     DeletePlaylist(String),
     Test,
     ResultPlaylist(Result<Playlist, Error>),
+    OpenInBrowser(String),
 }
 
 #[derive(Default, Debug, Clone)]

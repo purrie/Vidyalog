@@ -59,7 +59,8 @@ fn playlist_line_view<'a>(playlist: &Playlist) -> Element<'a, Message> {
         .width(Length::Fill),
         button("Delete").on_press(Message::DeletePlaylist(playlist.id.clone())),
         button("Mark as watched"),
-        button("Track on home page")
+        button("Track on home page"),
+        button("Open").on_press(Message::OpenInBrowser(playlist.url.clone()))
     )
     .width(Length::Fill)
     .spacing(5);
