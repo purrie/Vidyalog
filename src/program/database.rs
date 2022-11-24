@@ -40,21 +40,25 @@ impl Database {
         };
         self.playlists.get(i)
     }
-    pub fn update_playlist(&mut self, playlist: Playlist) {
+    pub fn update_playlist(&mut self, playlist: Playlist) -> Result<(), Error> {
+        playlist.save()?;
         if let Some(i) = self.playlist_index(&playlist.id) {
             self.playlists.remove(i);
             self.playlists.insert(i, playlist);
         } else {
             self.playlists.push(playlist);
         }
+        Ok(())
     }
-    pub fn update_video(&mut self, video: Video) {
+    pub fn update_video(&mut self, video: Video) -> Result<(), Error> {
+        video.save()?;
         if let Some(i) = self.video_index(&video.id) {
             self.videos.remove(i);
             self.videos.insert(i, video);
         } else {
             self.videos.push(video);
         }
+        Ok(())
     }
     pub fn get_video(&self, id: &str) -> Option<&Video> {
         let Some(i) = self.video_index(id) else {

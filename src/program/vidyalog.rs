@@ -116,8 +116,12 @@ impl Application for Vidyalog {
                     }
                     None => Command::none(),
                 };
-                self.data.update_playlist(playlist);
-                comm
+                if let Err(e) = self.data.update_playlist(playlist) {
+                    self.status.report(format!("{e}"));
+                    return Command::none();
+                } else {
+                    return comm;
+                }
             }
             Message::ResultPlaylist(Err(err)) => {
                 println!("{err}");
@@ -136,8 +140,9 @@ impl Application for Vidyalog {
                 Command::none()
             }
             Message::UpdateVideo(Ok(v)) => {
-                println!("Updated video: {}", v.title);
-                self.data.update_video(v);
+                if let Err(e) = self.data.update_video(v) {
+                    self.status.report(format!("{e}"));
+                }
                 Command::none()
             }
             Message::UpdateVideo(Err(e)) => {
