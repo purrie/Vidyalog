@@ -1,4 +1,4 @@
-use gui::Window;
+use program::Vidyalog;
 use iced::{Application, Settings};
 
 extern crate dirs;
@@ -14,10 +14,10 @@ mod data;
 mod enums;
 mod file;
 mod gui;
-mod paths;
 mod service;
 mod web;
+mod program;
 
 fn main() -> iced::Result {
-    Window::run(Settings::default())
+    Vidyalog::run(Settings::default())
 }

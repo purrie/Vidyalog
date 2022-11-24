@@ -7,12 +7,15 @@ impl Display for Error {
         match self {
             Error::Unknown => write!(f, "Unknown error occured"),
             Error::InvalidPlaylistURL(u) => write!(f, "{} is not a valid playlist URL", u),
+            Error::InvalidVideoURL(u) => write!(f, "{} is not a valid video URL", u),
             Error::IncompleteResponse => write!(f, "Error: Request response was incomplete"),
             Error::ReqwestError(e) => write!(f, "{}", e),
             Error::SerializationError(e) => write!(f, "{}", e),
             Error::IOError(e) => write!(f, "{}", e),
             Error::DeserializationError(e) => write!(f, "{}", e),
             Error::Utf8Error(e) => write!(f, "{}", e),
+            Error::ParsingError(e) => write!(f, "{}", e),
+            Error::MissingID(s) => write!(f, "Missing ID error: {}", s),
         }
     }
 }
@@ -44,5 +47,11 @@ impl From<std::io::Error> for Error {
 impl From<std::str::Utf8Error> for Error {
     fn from(e: std::str::Utf8Error) -> Self {
         Error::Utf8Error(format!("UTF8 Error: {}", e))
+    }
+}
+
+impl From<std::num::ParseIntError> for Error {
+    fn from(e: std::num::ParseIntError) -> Self {
+        Error::ParsingError(format!("Parsing error: {}", e))
     }
 }

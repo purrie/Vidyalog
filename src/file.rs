@@ -5,7 +5,9 @@ use std::{
 
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::{enums::Error, paths::playlists_path};
+use crate::enums::Error;
+
+pub const PROJECT_NAME: &str = "vidyalog";
 
 pub trait File {
     type Path: PathProvider;
@@ -97,8 +99,21 @@ pub trait FileID {
 }
 
 pub struct PlaylistPath();
+pub struct VideoPath();
+
 impl PathProvider for PlaylistPath {
     fn path() -> PathBuf {
-        playlists_path!()
+        let mut d = dirs::data_dir().unwrap();
+        d.push(PROJECT_NAME);
+        d.push("playlists");
+        d
+    }
+}
+impl PathProvider for VideoPath {
+    fn path() -> PathBuf {
+        let mut d = dirs::data_dir().unwrap();
+        d.push(PROJECT_NAME);
+        d.push("videos");
+        d
     }
 }

@@ -1,25 +1,19 @@
-use crate::{data::Playlist, enums::WindowScreen, service::ServiceProvider};
+use iced::Element;
 
-mod playlist_tracker;
+use crate::enums::Message;
+
+mod playlist_gui;
+mod video_gui;
 mod status;
-mod window;
-
-#[derive(Default)]
-pub struct Window {
-    screen: WindowScreen,
-    status: Status,
-    web: ServiceProvider,
-
-    playlist_tracker: PlaylistTracker,
-}
-
-#[derive(Default)]
-pub struct PlaylistTracker {
-    add_url: String,
-    playlists: Vec<Playlist>,
-}
 
 #[derive(Default)]
 pub struct Status {
     current: String,
+}
+
+pub trait ListView {
+    fn gui_list_view<'a>(&self) -> Element<'a, Message>;
+}
+pub trait DetailView {
+    fn gui_detail_view(&self) -> Element<Message>;
 }
