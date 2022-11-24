@@ -5,6 +5,7 @@ use reqwest::Client;
 mod browser;
 mod cookie;
 mod cookies;
+mod html;
 
 pub struct Browser {
     cookies: Cookies,
@@ -26,4 +27,8 @@ pub struct Cookie {
 #[derive(Default)]
 pub struct Cookies {
     cookies: Vec<Cookie>,
+}
+
+pub trait HTMLDecodable {
+    fn decode_html(&self) -> String;
 }

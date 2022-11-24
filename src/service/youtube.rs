@@ -1,9 +1,8 @@
-use htmlentity::entity::decode;
 use regex::{Captures, Regex};
 
 use crate::{
     data::{Playlist, Video},
-    enums::{Error, VideoService, VideoStatus},
+    enums::{Error, VideoService, VideoStatus}, web::HTMLDecodable,
 };
 
 use super::BrowserCarrier;
@@ -42,12 +41,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
             let regex = Regex::new(r"<title>(.+?)</title>").unwrap();
             if let Some(t) = regex.captures(&body) {
                 let t = t.get(1).unwrap().as_str();
-                let t = decode(&t)
-                    .iter()
-                    .fold(String::new(), |en, it| format!("{}{}", en, it));
-                // TODO decode the encoded stuff properly
-                println!("Found title: {:?}", t);
-                t.to_string()
+                t.decode_html()
             } else {
                 return Err(Error::IncompleteResponse);
             }
@@ -76,7 +70,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
         let description = {
             let regex = Regex::new(r#""descriptionText":\{"simpleText":"(.+?)"\}"#).unwrap();
             if let Some(c) = regex.captures(&playlist_data) {
-                c.get(1).unwrap().as_str().to_string()
+                c.get(1).unwrap().as_str().decode_html()
             } else {
                 String::new()
             }
@@ -157,16 +151,16 @@ pub async fn procure_video(browser: BrowserCarrier, url: String) -> Result<Video
                 }
             }};
         }
-        let title = extract_detail!(r#""title":"(.+?)""#, false).to_string();
+        let title = extract_detail!(r#""title":"(.+?)",""#, false).decode_html();
         let length_seconds = extract_detail!(r#""lengthSeconds":"(.+?)""#, false).parse::<u32>()?;
         let keywords = extract_detail!(r#""keywords":\[(.+?)\]"#, true)
             .split(',')
-            .map(|x| x.replace('"', ""))
+            .map(|x| x.decode_html().replace('"', ""))
             .collect();
-        let channel_id = extract_detail!(r#""channelId":"(.+?)""#, false).to_string();
-        let description = extract_detail!(r#""shortDescription":"(.+?)""#, false).to_string();
+        let channel_id = extract_detail!(r#""channelId":"(.+?)""#, false).decode_html();
+        let description = extract_detail!(r#""shortDescription":"(.+?)""#, false).decode_html();
         let views = extract_detail!(r#""viewCount":"(.+?)""#, false).parse::<u32>()?;
-        let author = extract_detail!(r#""author":"(.+?)""#, false).to_string();
+        let author = extract_detail!(r#""author":"(.+?)""#, false).decode_html();
 
         Ok(Video {
             title,
