@@ -1,10 +1,13 @@
-
 mod youtube;
-use std::{sync::Arc, future::Future};
+use std::{future::Future, sync::Arc};
 
 use iced::futures::lock::Mutex;
 
-use crate::{web::Browser, data::{Playlist, Video}, enums::{Error, VideoService}};
+use crate::{
+    data::{Playlist, Video},
+    enums::{Error, VideoService},
+    web::Browser,
+};
 
 type BrowserCarrier = Arc<Mutex<Browser>>;
 
@@ -30,13 +33,21 @@ impl VideoService {
         // TODO do a proper service detection
         VideoService::Unknown
     }
-    pub fn get_playlist(&self, browser: BrowserCarrier, url: String) -> impl Future<Output = Result<Playlist, Error>> {
+    pub fn get_playlist(
+        &self,
+        browser: BrowserCarrier,
+        url: String,
+    ) -> impl Future<Output = Result<Playlist, Error>> {
         match self {
             VideoService::Unknown => youtube::procure_playlist(browser, url),
             VideoService::Youtube => youtube::procure_playlist(browser, url),
         }
     }
-    pub fn get_video(&self, browser: BrowserCarrier, url: String) -> impl Future<Output = Result<Video, Error>> {
+    pub fn get_video(
+        &self,
+        browser: BrowserCarrier,
+        url: String,
+    ) -> impl Future<Output = Result<Video, Error>> {
         match self {
             VideoService::Unknown => youtube::procure_video(browser, url),
             VideoService::Youtube => youtube::procure_video(browser, url),
