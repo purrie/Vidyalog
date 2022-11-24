@@ -45,7 +45,7 @@ impl ListView for Vec<Playlist> {
 
 impl DetailView for Playlist {
     fn gui_detail_view(&self) -> Element<Message> {
-        column!(row!(text(&self.title)), row!(text(&self.id)),)
+        column!(row!(text(&self.title)), row!(text(&self.description)),)
             .width(Length::Fill)
             .height(Length::Shrink)
             .into()

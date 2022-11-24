@@ -52,13 +52,14 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
                 return Err(Error::IncompleteResponse);
             }
         };
+        let playlist_data = body
+            .lines()
+            .filter(|x| x.starts_with("<script"))
+            .filter(|x| x.contains("ytInitialData"))
+            .fold(String::new(), |i, x| format!("{}\n{}", i, x));
+
         let videos = {
             let mut videos = Vec::new();
-            let playlist_data = body
-                .lines()
-                .filter(|x| x.starts_with("<script"))
-                .filter(|x| x.contains("ytInitialData"))
-                .fold(String::new(), |i, x| format!("{}\n{}", i, x));
             let regex =
                 Regex::new(r#""watchEndpoint":\{"videoId":"(.+?)",.+?"index":(\d+),"#).unwrap();
             regex.captures_iter(&playlist_data).for_each(|x| {
@@ -72,12 +73,21 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
             }
             videos
         };
+        let description = {
+            let regex = Regex::new(r#""descriptionText":\{"simpleText":"(.+?)"\}"#).unwrap();
+            if let Some(c) = regex.captures(&playlist_data) {
+                c.get(1).unwrap().as_str().to_string()
+            } else {
+                String::new()
+            }
+        };
         // to get the playlist thumbnail, use playlistVideoThumbnailRenderer lookup
         Ok(Playlist {
             id,
             url,
             title,
             videos,
+            description,
             source: VideoService::Youtube,
         })
     } else {
@@ -124,7 +134,8 @@ pub async fn procure_video(browser: BrowserCarrier, url: String) -> Result<Video
                 .lines()
                 .filter(|x| x.contains(r#""videoDetails":{"videoId":"#))
                 .fold(String::new(), |_, x| x.to_string());
-            let regex = Regex::new(r#""videoDetails":\{"videoId":".+?",(.+?)trackingParams"#).unwrap();
+            let regex =
+                Regex::new(r#""videoDetails":\{"videoId":".+?",(.+?)trackingParams"#).unwrap();
             if let Some(c) = regex.captures(&line) {
                 c.get(1).unwrap().as_str().to_string()
             } else {
@@ -133,27 +144,25 @@ pub async fn procure_video(browser: BrowserCarrier, url: String) -> Result<Video
         };
 
         macro_rules! extract_detail {
-            ($reg:expr, $opt:expr) => {
-                {
-                    let regex = Regex::new($reg).unwrap();
-                    if let Some(c) = regex.captures(&video_details) {
-                        c.get(1).unwrap().as_str()
+            ($reg:expr, $opt:expr) => {{
+                let regex = Regex::new($reg).unwrap();
+                if let Some(c) = regex.captures(&video_details) {
+                    c.get(1).unwrap().as_str()
+                } else {
+                    if $opt {
+                        ""
                     } else {
-                        if $opt {
-                            ""
-                        } else {
-                            return Err(Error::ReqwestError(format!("{} failed", $reg)));
-                        }
+                        return Err(Error::ReqwestError(format!("{} failed", $reg)));
                     }
                 }
-            };
+            }};
         }
         let title = extract_detail!(r#""title":"(.+?)""#, false).to_string();
         let length_seconds = extract_detail!(r#""lengthSeconds":"(.+?)""#, false).parse::<u32>()?;
         let keywords = extract_detail!(r#""keywords":\[(.+?)\]"#, true)
-                    .split(',')
-                    .map(|x| x.replace('"', ""))
-                    .collect();
+            .split(',')
+            .map(|x| x.replace('"', ""))
+            .collect();
         let channel_id = extract_detail!(r#""channelId":"(.+?)""#, false).to_string();
         let description = extract_detail!(r#""shortDescription":"(.+?)""#, false).to_string();
         let views = extract_detail!(r#""viewCount":"(.+?)""#, false).parse::<u32>()?;

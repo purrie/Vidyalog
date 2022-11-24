@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::enums::{VideoStatus, VideoService};
+use crate::enums::{VideoService, VideoStatus};
 
 mod playlist;
 mod video;
@@ -12,6 +12,7 @@ pub struct Playlist {
     pub url: String,
     pub id: String,
     pub title: String,
+    pub description: String,
     /// Contains ID numbers for the videos
     pub videos: Vec<String>,
     pub source: VideoService,
