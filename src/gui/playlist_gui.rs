@@ -52,15 +52,18 @@ impl ListView for Playlist {
 
 impl DetailView for Playlist {
     fn gui_detail_view(&self) -> Element<Message> {
-        let top_box = Column::with_children(vec![
-            text(&self.title).size(30).into(),
-            horizontal_rule(2).into(),
-            vertical_space(Length::Units(5)).into(),
-            text(&self.description).into(),
-        ])
-        .padding(5);
+        let top_box = column!(
+            text(&self.title).size(30),
+            horizontal_rule(1),
+            vertical_space(Length::Units(5)),
+            text(&self.description)
+        )
+        .padding(5)
+        .width(Length::Fill);
+        let controls = column!(button("Open").on_press(Message::OpenInBrowser(self.url.clone())));
+        let content = row!(top_box, controls,);
 
-        let content = container(top_box)
+        let content = container(content)
             .style(Styles::Header)
             .padding(5)
             .width(Length::Fill)
