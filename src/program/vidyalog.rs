@@ -43,12 +43,6 @@ impl Application for Vidyalog {
                 self.inputs.add_playlist = url;
                 Command::none()
             }
-            Message::Test => {
-                let test =
-                    "https://www.youtube.com/watch?v=N0RazkMiamI&list=PLVobANUtm27GacOHvLqk2fA_lep7XRcXO&index=14"
-                        .to_string();
-                Command::perform(self.web.get_video(test), Message::ResultVideo)
-            }
             Message::OpenInBrowser(url) => {
                 open::that(url).unwrap();
                 Command::none()
@@ -180,7 +174,6 @@ impl Application for Vidyalog {
 impl Vidyalog {
     fn side_bar_view(&self) -> Element<Message> {
         column![
-            button("test").on_press(Message::Test),
             button("Playlists").on_press(Message::OpenScreen(WindowScreen::PlaylistTracker)),
         ]
         .width(Length::Shrink)

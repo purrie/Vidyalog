@@ -10,7 +10,6 @@ pub enum Message {
     AddPlaylistURL(String),
     AddPlaylist,
     DeletePlaylist(String),
-    Test,
     ResultPlaylist(Result<Playlist, Error>),
     ResultVideo(Result<Video, Error>),
     OpenInBrowser(String),
