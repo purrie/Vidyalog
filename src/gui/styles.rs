@@ -24,8 +24,8 @@ impl widget::container::StyleSheet for Styles {
                 let bgc = palette.background.darker().darker();
                 widget::container::Appearance {
                     background: Some(Background::Color(bgc)),
-                    border_width: 2.,
-                    border_radius: 2.,
+                    border_width: 0.,
+                    border_radius: 0.,
                     ..Default::default()
                 }
             }

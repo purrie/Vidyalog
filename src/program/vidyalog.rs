@@ -5,7 +5,7 @@ use iced::{
 
 use crate::{
     enums::{Message, WindowScreen},
-    gui::{DetailView, ListView},
+    gui::{DetailView, ListView, Styles},
 };
 
 use super::Vidyalog;
@@ -173,11 +173,15 @@ impl Application for Vidyalog {
 
 impl Vidyalog {
     fn side_bar_view(&self) -> Element<Message> {
-        column![
+        let buttons = column![
             button("Playlists").on_press(Message::OpenScreen(WindowScreen::PlaylistTracker)),
-        ]
-        .width(Length::Shrink)
-        .into()
+        ];
+        let content = container(buttons)
+            .style(Styles::Header)
+            .width(Length::Shrink)
+            .height(Length::Fill)
+            .padding(5);
+        content.into()
     }
     fn playlist_tracker_view(&self) -> Element<Message> {
         let bar = row!(
