@@ -35,7 +35,9 @@ impl ListView for Playlist {
                 row!(text(format!("Video count: {}", self.video_count())).width(Length::Shrink))
             )
             .width(Length::Fill),
-            button("Delete").on_press(Message::DeletePlaylist(self.id.clone())),
+            button("Delete")
+                .on_press(Message::DeletePlaylist(self.id.clone()))
+                .style(Styles::Danger.into()),
             button("Details").on_press(Message::OpenScreen(WindowScreen::PlaylistDetail(
                 self.id.clone()
             ))),

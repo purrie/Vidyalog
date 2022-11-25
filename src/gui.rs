@@ -2,11 +2,11 @@ use iced::Element;
 
 use crate::enums::Message;
 
+mod colors;
 mod playlist_gui;
-mod video_gui;
 mod status;
 mod styles;
-mod colors;
+mod video_gui;
 
 #[derive(Default)]
 pub struct Status {
@@ -23,9 +23,11 @@ pub trait DetailView {
 pub enum Styles {
     Box,
     Header,
+    Danger,
 }
 
 pub trait StyleAdjustment {
     fn lighter(self) -> Self;
     fn darker(self) -> Self;
+    fn redden(self) -> Self;
 }

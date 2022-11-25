@@ -18,4 +18,11 @@ impl StyleAdjustment for Color {
         let b = b - 0.1;
         Self { a, r, g, b }
     }
+
+    fn redden(self) -> Self {
+        let Color { a, r, g, b } = self;
+        let g = g * 0.8;
+        let b = b * 0.8;
+        Self { a, r, g, b }
+    }
 }
