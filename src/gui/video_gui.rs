@@ -1,5 +1,5 @@
 use iced::{
-    widget::{button, column, container, row, scrollable, text, Column},
+    widget::{button, column, container, row, scrollable, text, Column, horizontal_space},
     Element, Length,
 };
 
@@ -17,7 +17,15 @@ impl ListView for Vec<&Video> {
 
 impl ListView for Video {
     fn gui_list_view<'a>(&self) -> Element<'a, Message> {
-        let info = column!(text(&self.title), text(&self.author)).width(Length::Fill);
+        let mini_info = row!(
+            text(&self.author),
+            horizontal_space(Length::Units(20)),
+            text(format!(
+                "Video length: {}",
+                self.get_length()
+            ))
+        );
+        let info = column!(text(&self.title), mini_info).width(Length::Fill);
         let controls = button("Open").on_press(Message::OpenInBrowser(self.url.clone()));
         let line = row!(info, controls)
             .height(Length::Shrink)

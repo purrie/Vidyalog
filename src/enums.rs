@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::data::{Playlist, Video};
 
 pub mod error;
+mod video_status;
 
 /// Main UI messages
 #[derive(Debug, Clone)]
@@ -54,7 +55,7 @@ pub enum VideoStatus {
     #[default]
     Unseen,
     /// This marks the video as previously opened but not necessarily seen to completion.
-    Seen,
+    Seen(u32),
     /// Marks video as seen to completion
     Watched,
 }
