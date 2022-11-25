@@ -2,7 +2,8 @@ use regex::{Captures, Regex};
 
 use crate::{
     data::{Playlist, Video},
-    enums::{Error, VideoService, VideoStatus}, web::HTMLDecodable,
+    enums::{Error, VideoService, VideoStatus},
+    web::HTMLDecodable,
 };
 
 use super::BrowserCarrier;
