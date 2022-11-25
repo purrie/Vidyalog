@@ -8,6 +8,7 @@ use iced::{
 use crate::{
     data::Playlist,
     enums::{Message, WindowScreen},
+    service::ContentID,
 };
 
 use super::{DetailView, ListView, Styles};
@@ -38,10 +39,10 @@ impl ListView for Playlist {
 
         let controls = row!(
             button("Delete")
-                .on_press(Message::DeletePlaylist(self.id.clone()))
+                .on_press(Message::DeletePlaylist(self.get_content_id()))
                 .style(Styles::Danger.into()),
             button("Details").on_press(Message::OpenScreen(WindowScreen::PlaylistDetail(
-                self.id.clone()
+                self.get_content_id()
             ))),
             button("Open").on_press(Message::OpenInBrowser(self.url.clone()))
         )

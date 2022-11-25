@@ -1,12 +1,15 @@
 use serde::{Deserialize, Serialize};
 
-use crate::enums::{VideoService, VideoStatus};
+use crate::{
+    enums::{VideoService, VideoStatus},
+    service::ContentIdentifier,
+};
 
 mod playlist;
 mod video;
 
 /// Contains all the information necessary for tracking and playing a playlist
-#[derive(Default, Debug, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, Clone, Deserialize, Serialize, PartialEq)]
 #[serde(default)]
 pub struct Playlist {
     pub url: String,
@@ -15,11 +18,11 @@ pub struct Playlist {
     pub description: String,
     pub author: String,
     /// Contains ID numbers for the videos
-    pub videos: Vec<String>,
+    pub videos: Vec<ContentIdentifier<Video>>,
     pub source: VideoService,
 }
 
-#[derive(Default, Debug, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, Clone, Deserialize, Serialize, PartialEq)]
 #[serde(default)]
 pub struct Video {
     pub url: String,

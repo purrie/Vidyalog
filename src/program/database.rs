@@ -2,6 +2,7 @@ use crate::{
     data::{Playlist, Video},
     enums::Error,
     file::File,
+    service::{ContentID, ContentIdentifier},
 };
 
 use super::Database;
@@ -15,26 +16,26 @@ impl Default for Database {
 }
 
 impl Database {
-    pub fn playlist_index(&self, id: &str) -> Option<usize> {
-        self.playlists.iter().position(|x| x.id == id)
+    pub fn playlist_index(&self, id: &ContentIdentifier<Playlist>) -> Option<usize> {
+        self.playlists.iter().position(|x| id.identify(x))
     }
-    pub fn video_index(&self, id: &str) -> Option<usize> {
-        self.videos.iter().position(|x| x.id == id)
+    pub fn video_index(&self, id: &ContentIdentifier<Video>) -> Option<usize> {
+        self.videos.iter().position(|x| id.identify(x))
     }
     pub fn add_playlist(&mut self, playlist: Playlist) -> Result<(), Error> {
         playlist.save()?;
         self.playlists.push(playlist);
         Ok(())
     }
-    pub fn remove_playlist(&mut self, id: String) -> Result<(), Error> {
-        let Some(i) = self.playlist_index(&id) else {
-            return Err(Error::MissingID(id));
+    pub fn remove_playlist(&mut self, id: &ContentIdentifier<Playlist>) -> Result<(), Error> {
+        let Some(i) = self.playlist_index(id) else {
+            return Err(Error::Unknown);
         };
         let p = self.playlists.remove(i);
         p.delete()?;
         Ok(())
     }
-    pub fn get_playlist(&self, id: &str) -> Option<&Playlist> {
+    pub fn get_playlist(&self, id: &ContentIdentifier<Playlist>) -> Option<&Playlist> {
         let Some(i) = self.playlist_index(id) else {
             return None;
         };
@@ -42,7 +43,7 @@ impl Database {
     }
     pub fn update_playlist(&mut self, playlist: Playlist) -> Result<(), Error> {
         playlist.save()?;
-        if let Some(i) = self.playlist_index(&playlist.id) {
+        if let Some(i) = self.playlist_index(&playlist.get_content_id()) {
             self.playlists.remove(i);
             self.playlists.insert(i, playlist);
         } else {
@@ -52,7 +53,7 @@ impl Database {
     }
     pub fn update_video(&mut self, video: Video) -> Result<(), Error> {
         video.save()?;
-        if let Some(i) = self.video_index(&video.id) {
+        if let Some(i) = self.video_index(&video.get_content_id()) {
             self.videos.remove(i);
             self.videos.insert(i, video);
         } else {
@@ -60,13 +61,13 @@ impl Database {
         }
         Ok(())
     }
-    pub fn get_video(&self, id: &str) -> Option<&Video> {
+    pub fn get_video(&self, id: &ContentIdentifier<Video>) -> Option<&Video> {
         let Some(i) = self.video_index(id) else {
             return None;
         };
         self.videos.get(i)
     }
-    pub fn get_videos_by_id(&self, ids: &[String]) -> Vec<&Video> {
+    pub fn get_videos_by_id(&self, ids: &[ContentIdentifier<Video>]) -> Vec<&Video> {
         ids.iter()
             .map(|x| self.get_video(x))
             .filter(|x| x.is_some())
@@ -78,10 +79,13 @@ impl Database {
         self.videos.push(video);
         Ok(())
     }
-    pub fn get_missing_videos(&self, videos: &Vec<String>) -> Option<Vec<String>> {
-        let v: Vec<String> = videos
+    pub fn get_missing_videos(
+        &self,
+        videos: &Vec<ContentIdentifier<Video>>,
+    ) -> Option<Vec<ContentIdentifier<Video>>> {
+        let v: Vec<ContentIdentifier<Video>> = videos
             .iter()
-            .filter(|x| self.videos.iter().any(|a| **x == a.id) == false)
+            .filter(|x| self.videos.iter().any(|a| x.identify(a)) == false)
             .map(|x| x.clone())
             .collect();
         if v.len() == 0 {

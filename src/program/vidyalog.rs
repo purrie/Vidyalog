@@ -4,8 +4,10 @@ use iced::{
 };
 
 use crate::{
+    data::Playlist,
     enums::{Message, WindowScreen},
     gui::{DetailView, ListView, Styles},
+    service::ContentIdentifier,
 };
 
 use super::Vidyalog;
@@ -62,10 +64,9 @@ impl Application for Vidyalog {
                             .iter()
                             .map(|x| {
                                 Command::perform(
-                                    playlist.source.get_video(
-                                        self.web.get_browser(),
-                                        playlist.source.get_video_url(x),
-                                    ),
+                                    playlist
+                                        .source
+                                        .get_video(self.web.get_browser(), x.get_url()),
                                     Message::ResultVideo,
                                 )
                             })
@@ -83,7 +84,7 @@ impl Application for Vidyalog {
                 }
             }
             Message::DeletePlaylist(id) => {
-                if let Err(e) = self.data.remove_playlist(id) {
+                if let Err(e) = self.data.remove_playlist(&id) {
                     self.status
                         .report(format!("Failed to remove playlist: {}", e));
                 } else {
@@ -98,10 +99,9 @@ impl Application for Vidyalog {
                             .iter()
                             .map(|x| {
                                 Command::perform(
-                                    playlist.source.get_video(
-                                        self.web.get_browser(),
-                                        playlist.source.get_video_url(x),
-                                    ),
+                                    playlist
+                                        .source
+                                        .get_video(self.web.get_browser(), x.get_url()),
                                     Message::UpdateVideo,
                                 )
                             })
@@ -198,7 +198,7 @@ impl Vidyalog {
         let list = self.data.playlists.gui_list_view();
         column!(bar, list).into()
     }
-    fn playlist_detail_view(&self, id: &str) -> Element<Message> {
+    fn playlist_detail_view(&self, id: &ContentIdentifier<Playlist>) -> Element<Message> {
         let Some(pl) = self.data.get_playlist(id) else {
             return text(format!("Playlist id doesn't exist: {}", id)).into();
         };

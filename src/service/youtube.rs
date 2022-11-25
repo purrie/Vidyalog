@@ -6,7 +6,7 @@ use crate::{
     web::HTMLDecodable,
 };
 
-use super::BrowserCarrier;
+use super::{BrowserCarrier, ContentIdentifier};
 
 pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Playlist, Error> {
     let mut browser = browser.lock().await;
@@ -66,7 +66,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
             if videos.len() == 0 {
                 return Err(Error::IncompleteResponse);
             }
-            videos
+            videos.iter().map(|x| ContentIdentifier::new(&VideoService::Youtube, x)).collect()
         };
         let description = {
             let regex = Regex::new(r#""descriptionText":\{"simpleText":"(.+?)"\}"#).unwrap();

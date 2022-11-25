@@ -1,8 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use crate::data::{Playlist, Video};
+use crate::{
+    data::{Playlist, Video},
+    service::ContentIdentifier,
+};
 
 pub mod error;
+mod video_service;
 mod video_status;
 
 /// Main UI messages
@@ -10,7 +14,7 @@ mod video_status;
 pub enum Message {
     AddPlaylistURL(String),
     AddPlaylist,
-    DeletePlaylist(String),
+    DeletePlaylist(ContentIdentifier<Playlist>),
     ResultPlaylist(Result<Playlist, Error>),
     ResultVideo(Result<Video, Error>),
     OpenInBrowser(String),
@@ -23,10 +27,10 @@ pub enum Message {
 pub enum WindowScreen {
     #[default]
     PlaylistTracker,
-    PlaylistDetail(String),
+    PlaylistDetail(ContentIdentifier<Playlist>),
 }
 
-#[derive(Default, Debug, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub enum VideoService {
     #[default]
     Unknown,
@@ -49,7 +53,7 @@ pub enum Error {
 }
 
 /// Flag for videos to help distinguish watched from new videos.
-#[derive(Default, Debug, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub enum VideoStatus {
     /// Marks video as not seen, new basically.
     #[default]

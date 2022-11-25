@@ -1,4 +1,7 @@
-use crate::file::{File, FileID, VideoPath};
+use crate::{
+    file::{File, FileID, VideoPath},
+    service::{ContentID, ContentIdentifier},
+};
 
 use super::Video;
 
@@ -8,6 +11,14 @@ impl File for Video {
 impl FileID for Video {
     fn get_file_id(&self) -> &str {
         &self.id
+    }
+}
+impl ContentID for Video {
+    fn get_content_id(&self) -> ContentIdentifier<Self>
+    where
+        Self: Sized,
+    {
+        ContentIdentifier::new(&self.source, &self.id)
     }
 }
 

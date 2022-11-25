@@ -1,7 +1,10 @@
+mod content_id;
 mod youtube;
-use std::{future::Future, sync::Arc};
+
+use std::{future::Future, marker::PhantomData, sync::Arc};
 
 use iced::futures::lock::Mutex;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     data::{Playlist, Video},
@@ -59,4 +62,18 @@ impl VideoService {
             VideoService::Youtube => youtube::get_video_url(id),
         }
     }
+}
+
+#[derive(Default, PartialEq, Debug, Clone, Deserialize, Serialize)]
+#[serde(default)]
+pub struct ContentIdentifier<T> {
+    service: VideoService,
+    id: String,
+    pd: PhantomData<T>,
+}
+
+pub trait ContentID: PartialEq {
+    fn get_content_id(&self) -> ContentIdentifier<Self>
+    where
+        Self: Sized;
 }
