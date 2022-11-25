@@ -75,6 +75,14 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
                 String::new()
             }
         };
+        let author = {
+            let regex = Regex::new(r#""ownerText":\{"runs":\[\{"text":"(.+?)",""#).unwrap();
+            if let Some(c) = regex.captures(&playlist_data) {
+                c.get(1).unwrap().as_str().decode_html()
+            } else {
+                String::from("Unknown Author")
+            }
+        };
         // to get the playlist thumbnail, use playlistVideoThumbnailRenderer lookup
         Ok(Playlist {
             id,
@@ -82,6 +90,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
             title,
             videos,
             description,
+            author,
             source: VideoService::Youtube,
         })
     } else {

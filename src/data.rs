@@ -13,6 +13,7 @@ pub struct Playlist {
     pub id: String,
     pub title: String,
     pub description: String,
+    pub author: String,
     /// Contains ID numbers for the videos
     pub videos: Vec<String>,
     pub source: VideoService,

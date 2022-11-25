@@ -2,7 +2,7 @@ use iced::{
     widget::{
         button, column, container, horizontal_rule, row, scrollable, text, vertical_space, Column,
     },
-    Element, Length,
+    Alignment, Element, Length,
 };
 
 use crate::{
@@ -29,12 +29,14 @@ impl ListView for Vec<Playlist> {
 
 impl ListView for Playlist {
     fn gui_list_view<'a>(&self) -> Element<'a, Message> {
-        let main = row!(
-            column!(
-                text(&self.title).width(Length::Fill),
-                row!(text(format!("Video count: {}", self.video_count())).width(Length::Shrink))
-            )
-            .width(Length::Fill),
+        let info = column!(
+            text(&self.title).size(20),
+            text(&self.author).size(16),
+            text(format!("Video count: {}", self.video_count())).size(16)
+        )
+        .width(Length::Fill);
+
+        let controls = row!(
             button("Delete")
                 .on_press(Message::DeletePlaylist(self.id.clone()))
                 .style(Styles::Danger.into()),
@@ -43,11 +45,15 @@ impl ListView for Playlist {
             ))),
             button("Open").on_press(Message::OpenInBrowser(self.url.clone()))
         )
-        .width(Length::Fill)
-        .spacing(5);
+        .spacing(4);
+
+        let main = row!(info, controls,)
+            .width(Length::Fill)
+            .spacing(5)
+            .align_items(Alignment::Center);
 
         // let col = column!(vertical_space(Length::Units(5)), main, horizontal_rule(1));
-        let col = container(main).style(Styles::Box).padding(5);
+        let col = container(main).style(Styles::Distinguished).padding(5);
         col.into()
     }
 }
@@ -56,7 +62,8 @@ impl DetailView for Playlist {
     fn gui_detail_view(&self) -> Element<Message> {
         let top_box = column!(
             text(&self.title).size(30),
-            horizontal_rule(1),
+            horizontal_rule(4).style(Styles::Header),
+            text(format!("by {}", &self.author)),
             vertical_space(Length::Units(5)),
             text(&self.description)
         )

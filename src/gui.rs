@@ -21,7 +21,7 @@ pub trait DetailView {
 }
 
 pub enum Styles {
-    Box,
+    Distinguished,
     Header,
     Danger,
 }

@@ -22,7 +22,7 @@ impl ListView for Video {
         let line = row!(info, controls)
             .height(Length::Shrink)
             .width(Length::Fill);
-        let line = container(line).style(Styles::Box).padding(5);
+        let line = container(line).style(Styles::Distinguished).padding(5);
         line.into()
     }
 }
