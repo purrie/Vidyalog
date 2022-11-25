@@ -1,11 +1,11 @@
 use iced::{
-    widget::{button, column, row, scrollable, text, Column},
+    widget::{button, column, container, row, scrollable, text, Column},
     Element, Length,
 };
 
 use crate::{data::Video, enums::Message};
 
-use super::ListView;
+use super::{ListView, Styles};
 
 impl ListView for Vec<&Video> {
     fn gui_list_view<'a>(&self) -> Element<'a, Message> {
@@ -17,12 +17,12 @@ impl ListView for Vec<&Video> {
 
 impl ListView for Video {
     fn gui_list_view<'a>(&self) -> Element<'a, Message> {
-        row!(column!(
-            text(&self.title),
-            row!(text(&self.author), button("Open"))
-        ))
-        .width(Length::Fill)
-        .height(Length::Shrink)
-        .into()
+        let info = column!(text(&self.title), text(&self.author)).width(Length::Fill);
+        let controls = button("Open").on_press(Message::OpenInBrowser(self.url.clone()));
+        let line = row!(info, controls)
+            .height(Length::Shrink)
+            .width(Length::Fill);
+        let line = container(line).style(Styles::Box).padding(5);
+        line.into()
     }
 }
