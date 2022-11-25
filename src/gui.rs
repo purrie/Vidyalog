@@ -29,5 +29,5 @@ pub enum Styles {
 pub trait StyleAdjustment {
     fn lighter(self) -> Self;
     fn darker(self) -> Self;
-    fn redden(self) -> Self;
+    fn redder(self) -> Self;
 }

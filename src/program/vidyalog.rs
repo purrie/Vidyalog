@@ -1,6 +1,6 @@
 use iced::{
     widget::{button, column, container, row, text, text_input},
-    Application, Command, Element, Length,
+    Application, Command, Element, Length, Theme,
 };
 
 use crate::{
@@ -168,6 +168,9 @@ impl Application for Vidyalog {
             .center_x()
             .center_y()
             .into()
+    }
+    fn theme(&self) -> Self::Theme {
+        Theme::Light
     }
 }
 
