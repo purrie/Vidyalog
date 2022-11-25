@@ -1,5 +1,5 @@
 use crate::{
-    file::{File, FileID, PlaylistPath},
+    file::{File, PlaylistPath},
     service::{ContentID, ContentIdentifier},
 };
 
@@ -13,11 +13,6 @@ impl Playlist {
 
 impl File for Playlist {
     type Path = PlaylistPath;
-}
-impl FileID for Playlist {
-    fn get_file_id(&self) -> &str {
-        &self.id
-    }
 }
 impl ContentID for Playlist {
     fn get_content_id(&self) -> ContentIdentifier<Self>

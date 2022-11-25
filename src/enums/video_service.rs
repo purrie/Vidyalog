@@ -10,3 +10,12 @@ impl Display for VideoService {
         }
     }
 }
+
+impl VideoService {
+    pub fn get_path_name(&self) -> String {
+        match self {
+            VideoService::Unknown => "unknown",
+            VideoService::Youtube => "youtube",
+        }.to_string()
+    }
+}

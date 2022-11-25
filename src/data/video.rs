@@ -1,5 +1,5 @@
 use crate::{
-    file::{File, FileID, VideoPath},
+    file::{File, VideoPath},
     service::{ContentID, ContentIdentifier},
 };
 
@@ -7,11 +7,6 @@ use super::Video;
 
 impl File for Video {
     type Path = VideoPath;
-}
-impl FileID for Video {
-    fn get_file_id(&self) -> &str {
-        &self.id
-    }
 }
 impl ContentID for Video {
     fn get_content_id(&self) -> ContentIdentifier<Self>

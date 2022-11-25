@@ -67,8 +67,8 @@ impl VideoService {
 #[derive(Default, PartialEq, Debug, Clone, Deserialize, Serialize)]
 #[serde(default)]
 pub struct ContentIdentifier<T> {
-    service: VideoService,
-    id: String,
+    pub service: VideoService,
+    pub id: String,
     pd: PhantomData<T>,
 }
 
