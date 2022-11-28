@@ -67,6 +67,12 @@ impl Database {
         };
         self.videos.get(i)
     }
+    pub fn get_video_mut(&mut self, id: &ContentIdentifier<Video>) -> Option<&mut Video> {
+        let Some(i) = self.video_index(id) else {
+            return None;
+        };
+        self.videos.get_mut(i)
+    }
     pub fn get_videos_by_id(&self, ids: &[ContentIdentifier<Video>]) -> Vec<&Video> {
         ids.iter()
             .map(|x| self.get_video(x))

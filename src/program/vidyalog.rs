@@ -5,9 +5,9 @@ use iced::{
 
 use crate::{
     data::Playlist,
-    enums::{Message, WindowScreen},
+    enums::{Message, VideoStatus, WindowScreen},
     gui::{DetailView, ListView, Styles},
-    service::ContentIdentifier,
+    service::ContentIdentifier, file::File,
 };
 
 use super::Vidyalog;
@@ -147,6 +147,35 @@ impl Application for Vidyalog {
             Message::ResultVideo(Err(e)) => {
                 println!("{e}");
                 self.status.report(format!("{e}"));
+                Command::none()
+            }
+            Message::OpenVideoExternally(id) => {
+                let Some(mut vid) = self.data.get_video_mut(&id) else {
+                    self.status.report(format!("Video {} not found", id));
+                    return Command::none();
+                };
+                if vid.status == VideoStatus::Unseen {
+                    vid.status = VideoStatus::Browsed;
+                }
+                open::that(&vid.url).unwrap();
+                if let Err(e) = vid.save() {
+                    self.status.report(format!("Failed to update video {} because {}", vid.title, e));
+                }
+                Command::none()
+            }
+            Message::ToggleWatchStatus(id) => {
+                let Some(mut vid) = self.data.get_video_mut(&id) else {
+                    self.status.report(format!("Video {} not found", id));
+                    return Command::none();
+                };
+                vid.status = match vid.status {
+                    VideoStatus::Unseen => VideoStatus::Watched,
+                    VideoStatus::Browsed => VideoStatus::Watched,
+                    VideoStatus::Watched => VideoStatus::Unseen,
+                };
+                if let Err(e) = vid.save() {
+                    self.status.report(format!("Failed to update video {} because {}", vid.title, e));
+                }
                 Command::none()
             }
         }

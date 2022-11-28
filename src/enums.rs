@@ -18,6 +18,8 @@ pub enum Message {
     ResultPlaylist(Result<Playlist, Error>),
     ResultVideo(Result<Video, Error>),
     OpenInBrowser(String),
+    OpenVideoExternally(ContentIdentifier<Video>),
+    ToggleWatchStatus(ContentIdentifier<Video>),
     OpenScreen(WindowScreen),
     UpdatePlaylist(Result<Playlist, Error>),
     UpdateVideo(Result<Video, Error>),
@@ -58,8 +60,8 @@ pub enum VideoStatus {
     /// Marks video as not seen, new basically.
     #[default]
     Unseen,
-    /// This marks the video as previously opened but not necessarily seen to completion.
-    Seen(u32),
+    /// Marks the video as having been opened externally but there's no additional watch information
+    Browsed,
     /// Marks video as seen to completion
     Watched,
 }
