@@ -24,11 +24,13 @@ pub enum Message {
     UpdatePlaylist(Result<Playlist, Error>),
     UpdateVideo(Result<Video, Error>),
     SetTheme(iced::Theme),
+    ToggleTracking(ContentIdentifier<Playlist>),
 }
 
 #[derive(Default, Debug, Clone)]
 pub enum WindowScreen {
     #[default]
+    Home,
     PlaylistTracker,
     PlaylistDetail(ContentIdentifier<Playlist>),
 }

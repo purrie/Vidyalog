@@ -16,7 +16,7 @@ pub trait ListView {
     fn gui_list_view<'a>(&self) -> Element<'a, Message>;
 }
 pub trait DetailView {
-    fn gui_detail_view(&self) -> Element<Message>;
+    fn gui_detail_view<'a>(&self) -> Element<'a, Message>;
 }
 
 pub enum Styles {

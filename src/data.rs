@@ -20,6 +20,7 @@ pub struct Playlist {
     /// Contains ID numbers for the videos
     pub videos: Vec<ContentIdentifier<Video>>,
     pub source: VideoService,
+    pub tracked: bool,
 }
 
 #[derive(Default, Debug, Clone, Deserialize, Serialize, PartialEq)]
@@ -36,4 +37,9 @@ pub struct Video {
     pub status: VideoStatus,
     pub author: String,
     pub source: VideoService,
+}
+
+pub struct PlaylistFeed<'a> {
+    pub playlist: &'a Playlist,
+    pub latest: &'a Video,
 }

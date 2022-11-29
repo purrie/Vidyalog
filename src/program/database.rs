@@ -1,6 +1,6 @@
 use crate::{
-    data::{Playlist, Video},
-    enums::Error,
+    data::{Playlist, PlaylistFeed, Video},
+    enums::{Error, VideoStatus},
     file::File,
     service::{ContentID, ContentIdentifier},
 };
@@ -35,11 +35,38 @@ impl Database {
         p.delete()?;
         Ok(())
     }
+    pub fn get_fresh_playlists(&self) -> Vec<PlaylistFeed> {
+        self.playlists
+            .iter()
+            .filter(|x| x.tracked)
+            .filter_map(|p| {
+                if let Some(v) = p
+                    .videos
+                    .iter()
+                    .filter_map(|id| self.get_video(id))
+                    .find(|v| v.status != VideoStatus::Watched)
+                {
+                    Some(PlaylistFeed {
+                        playlist: p,
+                        latest: v,
+                    })
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
     pub fn get_playlist(&self, id: &ContentIdentifier<Playlist>) -> Option<&Playlist> {
         let Some(i) = self.playlist_index(id) else {
             return None;
         };
         self.playlists.get(i)
+    }
+    pub fn get_playlist_mut(&mut self, id: &ContentIdentifier<Playlist>) -> Option<&mut Playlist> {
+        let Some(i) = self.playlist_index(id) else {
+            return None;
+        };
+        self.playlists.get_mut(i)
     }
     pub fn update_playlist(&mut self, playlist: Playlist) -> Result<(), Error> {
         playlist.save()?;

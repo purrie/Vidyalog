@@ -66,7 +66,10 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
             if videos.len() == 0 {
                 return Err(Error::IncompleteResponse);
             }
-            videos.iter().map(|x| ContentIdentifier::new(&VideoService::Youtube, x)).collect()
+            videos
+                .iter()
+                .map(|x| ContentIdentifier::new(&VideoService::Youtube, x))
+                .collect()
         };
         let description = {
             let regex = Regex::new(r#""descriptionText":\{"simpleText":"(.+?)"\}"#).unwrap();
@@ -93,6 +96,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
             description,
             author,
             source: VideoService::Youtube,
+            tracked: false,
         })
     } else {
         Err(Error::ReqwestError(format!(

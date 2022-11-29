@@ -189,6 +189,18 @@ impl Application for Vidyalog {
                 self.theme = t;
                 Command::none()
             }
+            Message::ToggleTracking(id) => {
+                let Some(mut pl) = self.data.get_playlist_mut(&id) else {
+                    self.status.report(format!("Couldn't retrieve playlist {}", id));
+                    return Command::none();
+                };
+                pl.tracked = !pl.tracked;
+                if let Err(e) = pl.save() {
+                    self.status
+                        .report(format!("Failed to update video {} because {}", pl.title, e));
+                }
+                Command::none()
+            }
         }
     }
 
@@ -198,6 +210,7 @@ impl Application for Vidyalog {
         let main = match &self.screen {
             WindowScreen::PlaylistTracker => self.playlist_tracker_view(),
             WindowScreen::PlaylistDetail(id) => self.playlist_detail_view(id),
+            WindowScreen::Home => self.home_view(),
         };
 
         let content = column![row![bar, main].height(Length::Fill), self.status.line()];
@@ -217,6 +230,7 @@ impl Application for Vidyalog {
 impl Vidyalog {
     fn side_bar_view(&self) -> Element<Message> {
         let buttons = column![
+            button("Home").on_press(Message::OpenScreen(WindowScreen::Home)),
             button("Playlists").on_press(Message::OpenScreen(WindowScreen::PlaylistTracker)),
             button("Theme").on_press({
                 if self.theme == Theme::Light {
@@ -232,6 +246,21 @@ impl Vidyalog {
             .height(Length::Fill)
             .padding(5);
         content.into()
+    }
+    fn home_view(&self) -> Element<Message> {
+        let pl = self.data.get_fresh_playlists();
+        if pl.len() == 0 {
+            let tex: Element<_> = text("No new videos to watch").into();
+            return container(tex)
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .style(Styles::Background)
+                .center_x()
+                .center_y()
+                .into();
+        }
+        let list = pl.gui_list_view();
+        list.into()
     }
     fn playlist_tracker_view(&self) -> Element<Message> {
         let bar = row!(
