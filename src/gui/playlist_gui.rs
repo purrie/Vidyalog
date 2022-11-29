@@ -1,6 +1,7 @@
 use iced::{
     widget::{
-        button, column, container, horizontal_rule, row, scrollable, text, vertical_space, Column,
+        button, column, container, horizontal_rule, horizontal_space, row, scrollable, text,
+        vertical_space, Column,
     },
     Alignment, Element, Length,
 };
@@ -21,10 +22,16 @@ impl ListView for Vec<Playlist> {
                 .map(Element::from)
                 .collect(),
         )
-        .padding(5);
-        let scroll = scrollable(list).height(Length::Fill);
-
-        scroll.into()
+        .width(Length::Fill)
+        .spacing(4)
+        .padding(8);
+        let list = row!(list, horizontal_space(Length::Units(4)));
+        let scroll = scrollable(list).style(Styles::ContentFrame);
+        let cont = container(scroll)
+            .style(Styles::Background)
+            .height(Length::Fill)
+            .width(Length::Fill);
+        cont.into()
     }
 }
 
@@ -54,7 +61,7 @@ impl ListView for Playlist {
             .align_items(Alignment::Center);
 
         // let col = column!(vertical_space(Length::Units(5)), main, horizontal_rule(1));
-        let col = container(main).style(Styles::Distinguished).padding(5);
+        let col = container(main).style(Styles::ContentFrame).padding(5);
         col.into()
     }
 }

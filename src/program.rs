@@ -1,3 +1,5 @@
+use iced::Theme;
+
 use crate::{
     data::{Playlist, Video},
     enums::WindowScreen,
@@ -15,6 +17,7 @@ pub struct Vidyalog {
     web: ServiceProvider,
     data: Database,
     inputs: Inputs,
+    theme: Theme,
 }
 
 pub struct Database {

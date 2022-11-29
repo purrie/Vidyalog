@@ -23,6 +23,7 @@ pub enum Message {
     OpenScreen(WindowScreen),
     UpdatePlaylist(Result<Playlist, Error>),
     UpdateVideo(Result<Video, Error>),
+    SetTheme(iced::Theme),
 }
 
 #[derive(Default, Debug, Clone)]

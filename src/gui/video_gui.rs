@@ -10,8 +10,13 @@ use super::{ListView, Styles};
 impl ListView for Vec<&Video> {
     fn gui_list_view<'a>(&self) -> Element<'a, Message> {
         let ui = self.iter().map(|x| x.gui_list_view()).collect();
-        let c = Column::with_children(ui).width(Length::Fill);
-        scrollable(c).height(Length::Fill).into()
+        let c = Column::with_children(ui).width(Length::Fill).spacing(4).padding(8);
+        let c = row!(c, horizontal_space(Length::Units(4)));
+        let scroll = scrollable(c).style(Styles::ContentFrame);
+        let scroll = container(scroll)
+            .height(Length::Fill)
+            .style(Styles::Background);
+        scroll.into()
     }
 }
 
@@ -22,7 +27,7 @@ impl ListView for Video {
             horizontal_space(Length::Units(10)),
             button(self.status.as_label())
                 .on_press(Message::ToggleWatchStatus(self.get_content_id()))
-                .style(Styles::Distinguished.into()),
+                .style(Styles::ContentFrame.into()),
         )
         .align_items(Alignment::Center);
         let mini_info = row!(
@@ -36,7 +41,7 @@ impl ListView for Video {
         let line = row!(info, controls)
             .height(Length::Shrink)
             .width(Length::Fill);
-        let line = container(line).style(Styles::Distinguished).padding(5);
+        let line = container(line).style(Styles::ContentFrame).padding(5);
         line.into()
     }
 }

@@ -2,7 +2,6 @@ use iced::Element;
 
 use crate::enums::Message;
 
-mod colors;
 mod playlist_gui;
 mod status;
 mod styles;
@@ -21,13 +20,8 @@ pub trait DetailView {
 }
 
 pub enum Styles {
-    Distinguished,
+    Background,
+    ContentFrame,
     Header,
     Danger,
-}
-
-pub trait StyleAdjustment {
-    fn lighter(self) -> Self;
-    fn darker(self) -> Self;
-    fn redder(self) -> Self;
 }

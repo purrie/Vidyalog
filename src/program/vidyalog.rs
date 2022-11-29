@@ -6,8 +6,9 @@ use iced::{
 use crate::{
     data::Playlist,
     enums::{Message, VideoStatus, WindowScreen},
+    file::File,
     gui::{DetailView, ListView, Styles},
-    service::ContentIdentifier, file::File,
+    service::ContentIdentifier,
 };
 
 use super::Vidyalog;
@@ -159,7 +160,10 @@ impl Application for Vidyalog {
                 }
                 open::that(&vid.url).unwrap();
                 if let Err(e) = vid.save() {
-                    self.status.report(format!("Failed to update video {} because {}", vid.title, e));
+                    self.status.report(format!(
+                        "Failed to update video {} because {}",
+                        vid.title, e
+                    ));
                 }
                 Command::none()
             }
@@ -174,8 +178,15 @@ impl Application for Vidyalog {
                     VideoStatus::Watched => VideoStatus::Unseen,
                 };
                 if let Err(e) = vid.save() {
-                    self.status.report(format!("Failed to update video {} because {}", vid.title, e));
+                    self.status.report(format!(
+                        "Failed to update video {} because {}",
+                        vid.title, e
+                    ));
                 }
+                Command::none()
+            }
+            Message::SetTheme(t) => {
+                self.theme = t;
                 Command::none()
             }
         }
@@ -199,7 +210,7 @@ impl Application for Vidyalog {
             .into()
     }
     fn theme(&self) -> Self::Theme {
-        Theme::Light
+        self.theme.clone()
     }
 }
 
@@ -207,6 +218,13 @@ impl Vidyalog {
     fn side_bar_view(&self) -> Element<Message> {
         let buttons = column![
             button("Playlists").on_press(Message::OpenScreen(WindowScreen::PlaylistTracker)),
+            button("Theme").on_press({
+                if self.theme == Theme::Light {
+                    Message::SetTheme(Theme::Dark)
+                } else {
+                    Message::SetTheme(Theme::Light)
+                }
+            })
         ];
         let content = container(buttons)
             .style(Styles::Header)
