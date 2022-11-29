@@ -23,8 +23,14 @@ impl Database {
         self.videos.iter().position(|x| id.identify(x))
     }
     pub fn add_playlist(&mut self, playlist: Playlist) -> Result<(), Error> {
-        playlist.save()?;
-        self.playlists.push(playlist);
+        if let Some(i) = self.playlist_index(&playlist.get_content_id()) {
+            let pl = self.playlists.get_mut(i).unwrap();
+            pl.update(playlist);
+            pl.save()?;
+        } else {
+            playlist.save()?;
+            self.playlists.push(playlist);
+        }
         Ok(())
     }
     pub fn remove_playlist(&mut self, id: &ContentIdentifier<Playlist>) -> Result<(), Error> {
@@ -68,26 +74,6 @@ impl Database {
         };
         self.playlists.get_mut(i)
     }
-    pub fn update_playlist(&mut self, playlist: Playlist) -> Result<(), Error> {
-        playlist.save()?;
-        if let Some(i) = self.playlist_index(&playlist.get_content_id()) {
-            self.playlists.remove(i);
-            self.playlists.insert(i, playlist);
-        } else {
-            self.playlists.push(playlist);
-        }
-        Ok(())
-    }
-    pub fn update_video(&mut self, video: Video) -> Result<(), Error> {
-        video.save()?;
-        if let Some(i) = self.video_index(&video.get_content_id()) {
-            self.videos.remove(i);
-            self.videos.insert(i, video);
-        } else {
-            self.videos.push(video);
-        }
-        Ok(())
-    }
     pub fn get_video(&self, id: &ContentIdentifier<Video>) -> Option<&Video> {
         let Some(i) = self.video_index(id) else {
             return None;
@@ -108,8 +94,14 @@ impl Database {
             .collect()
     }
     pub fn add_video(&mut self, video: Video) -> Result<(), Error> {
-        video.save()?;
-        self.videos.push(video);
+        if let Some(i) = self.video_index(&video.get_content_id()) {
+            let v = self.videos.get_mut(i).unwrap();
+            v.update(video);
+            v.save()?;
+        } else {
+            video.save()?;
+            self.videos.push(video);
+        }
         Ok(())
     }
     pub fn get_missing_videos(

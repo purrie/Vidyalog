@@ -28,7 +28,7 @@ impl Application for Vidyalog {
             .map(|x| {
                 Command::perform(
                     x.source.get_playlist(app.web.get_browser(), x.url.clone()),
-                    Message::UpdatePlaylist,
+                    Message::AddPlaylist,
                 )
             })
             .collect();
@@ -54,11 +54,11 @@ impl Application for Vidyalog {
                 self.screen = screen;
                 Command::none()
             }
-            Message::AddPlaylist => {
+            Message::QueryPlaylist => {
                 let p = std::mem::take(&mut self.inputs.add_playlist);
-                Command::perform(self.web.get_playlist(p), Message::ResultPlaylist)
+                Command::perform(self.web.get_playlist(p), Message::AddPlaylist)
             }
-            Message::ResultPlaylist(Ok(playlist)) => {
+            Message::AddPlaylist(Ok(playlist)) => {
                 let comm = match self.data.get_missing_videos(&playlist.videos) {
                     Some(miss) => {
                         let missing: Vec<Command<_>> = miss
@@ -68,7 +68,7 @@ impl Application for Vidyalog {
                                     playlist
                                         .source
                                         .get_video(self.web.get_browser(), x.get_url()),
-                                    Message::ResultVideo,
+                                    Message::AddVideo,
                                 )
                             })
                             .collect();
@@ -93,59 +93,18 @@ impl Application for Vidyalog {
                 }
                 Command::none()
             }
-            Message::UpdatePlaylist(Ok(playlist)) => {
-                let comm = match self.data.get_missing_videos(&playlist.videos) {
-                    Some(miss) => {
-                        let missing: Vec<Command<_>> = miss
-                            .iter()
-                            .map(|x| {
-                                Command::perform(
-                                    playlist
-                                        .source
-                                        .get_video(self.web.get_browser(), x.get_url()),
-                                    Message::UpdateVideo,
-                                )
-                            })
-                            .collect();
-                        Command::batch(missing)
-                    }
-                    None => Command::none(),
-                };
-                if let Err(e) = self.data.update_playlist(playlist) {
-                    self.status.report(format!("{e}"));
-                    return Command::none();
-                } else {
-                    return comm;
-                }
-            }
-            Message::ResultPlaylist(Err(err)) => {
+            Message::AddPlaylist(Err(err)) => {
                 println!("{err}");
                 self.status.report(format!("{err}"));
                 Command::none()
             }
-            Message::UpdatePlaylist(Err(e)) => {
-                println!("{e}");
-                self.status.report(format!("{e}"));
-                Command::none()
-            }
-            Message::ResultVideo(Ok(video)) => {
+            Message::AddVideo(Ok(video)) => {
                 if let Err(e) = self.data.add_video(video) {
-                    self.status.report(format!("Failed to add video: {}", e));
+                    self.status.report(format!("Failed to add or update video: {}", e));
                 }
                 Command::none()
             }
-            Message::UpdateVideo(Ok(v)) => {
-                if let Err(e) = self.data.update_video(v) {
-                    self.status.report(format!("{e}"));
-                }
-                Command::none()
-            }
-            Message::UpdateVideo(Err(e)) => {
-                println!("{e}");
-                self.status.report(format!("{e}"));
-                Command::none()
-            }
-            Message::ResultVideo(Err(e)) => {
+            Message::AddVideo(Err(e)) => {
                 println!("{e}");
                 self.status.report(format!("{e}"));
                 Command::none()
@@ -269,7 +228,7 @@ impl Vidyalog {
                 &self.inputs.add_playlist,
                 Message::AddPlaylistURL
             ),
-            button("Add").on_press(Message::AddPlaylist)
+            button("Add").on_press(Message::QueryPlaylist)
         );
         let list = self.data.playlists.gui_list_view();
         column!(bar, list).into()

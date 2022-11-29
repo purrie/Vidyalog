@@ -30,4 +30,16 @@ impl Video {
             format!("{}:{}", m_m, m_s)
         }
     }
+    pub fn update(&mut self, other: Video) {
+        if self.url != other.url {
+            return;
+        }
+        self.title = other.title;
+        self.description = other.description;
+        self.length_seconds = other.length_seconds;
+        self.keywords = other.keywords;
+        self.channel_id = other.channel_id;
+        self.views = other.views;
+        self.author = other.author;
+    }
 }

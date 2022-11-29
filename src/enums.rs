@@ -13,16 +13,14 @@ mod video_status;
 #[derive(Debug, Clone)]
 pub enum Message {
     AddPlaylistURL(String),
-    AddPlaylist,
+    QueryPlaylist,
     DeletePlaylist(ContentIdentifier<Playlist>),
-    ResultPlaylist(Result<Playlist, Error>),
-    ResultVideo(Result<Video, Error>),
+    AddPlaylist(Result<Playlist, Error>),
+    AddVideo(Result<Video, Error>),
     OpenInBrowser(String),
     OpenVideoExternally(ContentIdentifier<Video>),
     ToggleWatchStatus(ContentIdentifier<Video>),
     OpenScreen(WindowScreen),
-    UpdatePlaylist(Result<Playlist, Error>),
-    UpdateVideo(Result<Video, Error>),
     SetTheme(iced::Theme),
     ToggleTracking(ContentIdentifier<Playlist>),
 }
