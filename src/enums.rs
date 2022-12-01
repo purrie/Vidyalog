@@ -8,6 +8,7 @@ use crate::{
 pub mod error;
 mod video_service;
 mod video_status;
+mod tooltips;
 
 /// Main UI messages
 #[derive(Debug, Clone)]
@@ -77,4 +78,14 @@ pub enum VideoStatus {
     Browsed,
     /// Marks video as seen to completion
     Watched,
+}
+
+pub enum TooltipText {
+    OpenInBrowser,
+    ChangeStatus,
+    PlaylistDetails,
+    ContinueWatching,
+    TrackPlaylist,
+    UntrackPlaylist,
+    Delete
 }

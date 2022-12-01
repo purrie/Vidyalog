@@ -1,14 +1,14 @@
 use iced::{
     widget::{
         button, column, container, horizontal_rule, horizontal_space, row, scrollable, text,
-        vertical_space, Column, Image,
+        tooltip, vertical_space, Column, Image,
     },
     Alignment, Element, Length,
 };
 
 use crate::{
     data::{Playlist, PlaylistFeed},
-    enums::{Message, WindowScreen},
+    enums::{Message, TooltipText, WindowScreen},
     program::Database,
     service::ContentID,
 };
@@ -66,6 +66,11 @@ impl<'p> ListView for PlaylistFeed<'p> {
         let video_status = button(self.latest.status.as_label())
             .on_press(Message::ToggleWatchStatus(self.latest.get_content_id()))
             .style(Styles::ContentFrame.into());
+        let video_status = tooltip(
+            video_status,
+            TooltipText::ChangeStatus,
+            tooltip::Position::Right,
+        );
 
         let mut video: Element<_> = column!(
             video_title,
@@ -99,10 +104,21 @@ impl<'p> ListView for PlaylistFeed<'p> {
             ui = row!(img, ui).spacing(4).into();
         }
         let controls = column!(
-            button("Details").on_press(Message::OpenScreen(WindowScreen::PlaylistDetail(
-                self.playlist.get_content_id()
-            ))),
-            button("Continue").on_press(Message::OpenVideoExternally(self.latest.get_content_id()))
+            tooltip(
+                button("Details").on_press(Message::OpenScreen(WindowScreen::PlaylistDetail(
+                    self.playlist.get_content_id()
+                ))),
+                TooltipText::PlaylistDetails,
+                tooltip::Position::Top
+            )
+            .style(Styles::Header),
+            tooltip(
+                button("Continue")
+                    .on_press(Message::OpenVideoExternally(self.latest.get_content_id())),
+                TooltipText::ContinueWatching,
+                tooltip::Position::Bottom
+            )
+            .style(Styles::Header)
         )
         .spacing(4);
         let content = container(
@@ -127,15 +143,39 @@ impl ListView for Playlist {
         .width(Length::Fill);
 
         let controls = row!(
-            button(if self.tracked { "Untrack" } else { "Track" })
-                .on_press(Message::ToggleTracking(self.get_content_id())),
-            button("Delete")
-                .on_press(Message::DeletePlaylist(self.get_content_id()))
-                .style(Styles::Danger.into()),
-            button("Details").on_press(Message::OpenScreen(WindowScreen::PlaylistDetail(
-                self.get_content_id()
-            ))),
-            button("Open").on_press(Message::OpenInBrowser(self.url.clone()))
+            tooltip(
+                button(if self.tracked { "Untrack" } else { "Track" })
+                    .on_press(Message::ToggleTracking(self.get_content_id())),
+                if self.tracked {
+                    TooltipText::UntrackPlaylist
+                } else {
+                    TooltipText::TrackPlaylist
+                },
+                tooltip::Position::Bottom
+            )
+            .style(Styles::Header),
+            tooltip(
+                button("Delete")
+                    .on_press(Message::DeletePlaylist(self.get_content_id()))
+                    .style(Styles::Danger.into()),
+                TooltipText::Delete,
+                tooltip::Position::Bottom
+            )
+            .style(Styles::Header),
+            tooltip(
+                button("Details").on_press(Message::OpenScreen(WindowScreen::PlaylistDetail(
+                    self.get_content_id()
+                ))),
+                TooltipText::PlaylistDetails,
+                tooltip::Position::Bottom
+            )
+            .style(Styles::Header),
+            tooltip(
+                button("Open").on_press(Message::OpenInBrowser(self.url.clone())),
+                TooltipText::OpenInBrowser,
+                tooltip::Position::Bottom
+            )
+            .style(Styles::Header)
         )
         .spacing(4);
 
@@ -167,9 +207,21 @@ impl DetailView for Playlist {
         .padding(5)
         .width(Length::Fill);
         let controls = column!(
-            button("Open").on_press(Message::OpenInBrowser(self.url.clone())),
-            button(if self.tracked { "Untrack" } else { "Track" })
-                .on_press(Message::ToggleTracking(self.get_content_id()))
+            tooltip(
+                button("Open").on_press(Message::OpenInBrowser(self.url.clone())),
+                TooltipText::OpenInBrowser,
+                tooltip::Position::Left
+            ),
+            tooltip(
+                button(if self.tracked { "Untrack" } else { "Track" })
+                    .on_press(Message::ToggleTracking(self.get_content_id())),
+                if self.tracked {
+                    TooltipText::UntrackPlaylist
+                } else {
+                    TooltipText::TrackPlaylist
+                },
+                tooltip::Position::Left
+            )
         )
         .spacing(4)
         .align_items(Alignment::End);

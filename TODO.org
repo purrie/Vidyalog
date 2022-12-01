@@ -37,10 +37,10 @@ This would pretty much work like ani-cli but for youtube as is, and with graphic
 ** Other video sites
 Odysee and Rumble among others would be neat addition. One app to watch them all.
 
-* Release target 0.2 [0/6]
-** [ ] Program [1/2]
+* Release target 0.2 [1/6]
+** [X] Program [2/2]
 - [X] Thumbnail retriever
-- [ ] Tooltips
+- [X] Tooltips
 ** [ ] Settings screen [0/3]
 - [ ] Button to go to the screen
 - [ ] Ability to change between light and dark mode

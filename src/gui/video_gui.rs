@@ -1,12 +1,17 @@
 use iced::{
     widget::{
-        button, column, container, horizontal_space, image, row, scrollable, text, vertical_space,
-        Column,
+        button, column, container, horizontal_space, image, row, scrollable, text, tooltip,
+        tooltip::Position, vertical_space, Column,
     },
     Alignment, Element, Length,
 };
 
-use crate::{data::Video, enums::Message, program::Database, service::ContentID};
+use crate::{
+    data::Video,
+    enums::{Message, TooltipText},
+    program::Database,
+    service::ContentID,
+};
 
 use super::{ListView, Styles, THUMBNAIL_SIZE_SMALL};
 
@@ -34,9 +39,13 @@ impl ListView for Video {
         let status = row!(
             text(format!("Video length: {}", self.get_length())),
             horizontal_space(Length::Units(10)),
-            button(self.status.as_label())
-                .on_press(Message::ToggleWatchStatus(self.get_content_id()))
-                .style(Styles::ContentFrame.into()),
+            tooltip(
+                button(self.status.as_label())
+                    .on_press(Message::ToggleWatchStatus(self.get_content_id()))
+                    .style(Styles::ContentFrame.into()),
+                TooltipText::ChangeStatus,
+                Position::Right
+            ),
         )
         .align_items(Alignment::Center);
         let info = column!(
@@ -47,6 +56,8 @@ impl ListView for Video {
         )
         .width(Length::Fill);
         let controls = button("Open").on_press(Message::OpenVideoExternally(self.get_content_id()));
+        let controls =
+            tooltip(controls, TooltipText::OpenInBrowser, Position::Bottom).style(Styles::Header);
         let mut line = row!().spacing(4).height(Length::Shrink).width(Length::Fill);
         if let Some(th) = database.get_thumbnail_image(&self.thumbnail) {
             let img = image::Image::new(th)
