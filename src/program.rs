@@ -1,13 +1,14 @@
-use iced::Theme;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     data::{Playlist, Thumbnail, Video},
-    enums::WindowScreen,
+    enums::{ColorTheme, WindowScreen},
     gui::Status,
     service::ServiceProvider,
 };
 
 mod database;
+mod settings;
 mod vidyalog;
 
 #[derive(Default)]
@@ -17,7 +18,7 @@ pub struct Vidyalog {
     web: ServiceProvider,
     data: Database,
     inputs: Inputs,
-    theme: Theme,
+    settings: Settings,
 }
 
 pub struct Database {
@@ -29,4 +30,9 @@ pub struct Database {
 #[derive(Default)]
 pub struct Inputs {
     add_playlist: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Settings {
+    theme: ColorTheme,
 }

@@ -1,6 +1,6 @@
 use iced::{
-    widget::{button, column, container, row, text, text_input},
-    Application, Command, Element, Length, Theme,
+    widget::{button, column, container, row, text, text_input, vertical_space},
+    Application, Command, Element, Length,
 };
 
 use crate::{
@@ -146,7 +146,7 @@ impl Application for Vidyalog {
                     vid.status = VideoStatus::Browsed;
                 }
                 open::that(&vid.url).unwrap();
-                if let Err(e) = vid.save() {
+                if let Err(e) = vid.save_content() {
                     self.status.report(format!(
                         "Failed to update video {} because {}",
                         vid.title, e
@@ -164,7 +164,7 @@ impl Application for Vidyalog {
                     VideoStatus::Browsed => VideoStatus::Watched,
                     VideoStatus::Watched => VideoStatus::Unseen,
                 };
-                if let Err(e) = vid.save() {
+                if let Err(e) = vid.save_content() {
                     self.status.report(format!(
                         "Failed to update video {} because {}",
                         vid.title, e
@@ -173,7 +173,11 @@ impl Application for Vidyalog {
                 Command::none()
             }
             Message::SetTheme(t) => {
-                self.theme = t;
+                self.settings.theme = t;
+                if let Err(e) = self.settings.save_file() {
+                    self.status
+                        .report(format!("Failed to save settings: {}", e));
+                }
                 Command::none()
             }
             Message::ToggleTracking(id) => {
@@ -182,7 +186,7 @@ impl Application for Vidyalog {
                     return Command::none();
                 };
                 pl.tracked = !pl.tracked;
-                if let Err(e) = pl.save() {
+                if let Err(e) = pl.save_content() {
                     self.status
                         .report(format!("Failed to update video {} because {}", pl.title, e));
                 }
@@ -210,6 +214,7 @@ impl Application for Vidyalog {
             WindowScreen::PlaylistTracker => self.playlist_tracker_view(),
             WindowScreen::PlaylistDetail(id) => self.playlist_detail_view(id),
             WindowScreen::Home => self.home_view(),
+            WindowScreen::Settings => self.settings_view(),
         };
 
         let content = column![row![bar, main].height(Length::Fill), self.status.line()];
@@ -222,7 +227,7 @@ impl Application for Vidyalog {
             .into()
     }
     fn theme(&self) -> Self::Theme {
-        self.theme.clone()
+        self.settings.theme.into()
     }
 }
 
@@ -231,13 +236,8 @@ impl Vidyalog {
         let buttons = column![
             button("Home").on_press(Message::OpenScreen(WindowScreen::Home)),
             button("Playlists").on_press(Message::OpenScreen(WindowScreen::PlaylistTracker)),
-            button("Theme").on_press({
-                if self.theme == Theme::Light {
-                    Message::SetTheme(Theme::Dark)
-                } else {
-                    Message::SetTheme(Theme::Light)
-                }
-            })
+            vertical_space(Length::Fill),
+            button("Settings").on_press(Message::OpenScreen(WindowScreen::Settings))
         ];
         let content = container(buttons)
             .style(Styles::Header)
@@ -282,5 +282,8 @@ impl Vidyalog {
         let detail = pl.gui_detail_view(&self.data);
         let video_list = vids.gui_list_view(&self.data);
         column!(detail, video_list).into()
+    }
+    fn settings_view(&self) -> Element<Message> {
+        self.settings.gui_list_view(&self.data)
     }
 }

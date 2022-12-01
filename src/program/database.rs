@@ -36,9 +36,9 @@ impl Database {
         if let Some(i) = self.playlist_index(&playlist.get_content_id()) {
             let pl = self.playlists.get_mut(i).unwrap();
             pl.update(playlist);
-            pl.save()?;
+            pl.save_content()?;
         } else {
-            playlist.save()?;
+            playlist.save_content()?;
             self.playlists.push(playlist);
         }
         Ok(())
@@ -107,9 +107,9 @@ impl Database {
         if let Some(i) = self.video_index(&video.get_content_id()) {
             let v = self.videos.get_mut(i).unwrap();
             v.update(video);
-            v.save()?;
+            v.save_content()?;
         } else {
-            video.save()?;
+            video.save_content()?;
             self.videos.push(video);
         }
         Ok(())
@@ -149,9 +149,9 @@ impl Database {
         if let Some(i) = self.thumbnail_index(&thumb.get_content_id()) {
             let t = self.thumbnails.get_mut(i).unwrap();
             t.update(thumb)?;
-            t.save()?;
+            t.save_content()?;
         } else {
-            thumb.save()?;
+            thumb.save_content()?;
             self.thumbnails.push(thumb);
         }
         Ok(())

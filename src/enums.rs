@@ -9,6 +9,7 @@ pub mod error;
 mod video_service;
 mod video_status;
 mod tooltips;
+mod colortheme;
 
 /// Main UI messages
 #[derive(Debug, Clone)]
@@ -23,7 +24,7 @@ pub enum Message {
     OpenVideoExternally(ContentIdentifier<Video>),
     ToggleWatchStatus(ContentIdentifier<Video>),
     OpenScreen(WindowScreen),
-    SetTheme(iced::Theme),
+    SetTheme(ColorTheme),
     ToggleTracking(ContentIdentifier<Playlist>),
 }
 
@@ -33,6 +34,7 @@ pub enum WindowScreen {
     Home,
     PlaylistTracker,
     PlaylistDetail(ContentIdentifier<Playlist>),
+    Settings,
 }
 
 #[derive(Default, Debug, Clone, Deserialize, Serialize, PartialEq)]
@@ -88,4 +90,11 @@ pub enum TooltipText {
     TrackPlaylist,
     UntrackPlaylist,
     Delete
+}
+
+#[derive(Default, Debug, Clone, Copy, Deserialize, Serialize, PartialEq, Eq)]
+pub enum ColorTheme {
+    #[default]
+    Light,
+    Dark,
 }

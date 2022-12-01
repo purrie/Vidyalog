@@ -12,7 +12,7 @@ pub const PROJECT_NAME: &str = "vidyalog";
 pub trait File {
     type Path: PathProvider;
 
-    fn save(&self) -> Result<(), Error>
+    fn save_content(&self) -> Result<(), Error>
     where
         Self: Serialize + ContentID + Sized,
     {
@@ -28,6 +28,39 @@ pub trait File {
         let ser = ron::ser::to_string_pretty(self, pretty)?;
         write(path, ser.as_bytes())?;
         Ok(())
+    }
+    fn save_file(&self) -> Result<(), Error>
+    where
+        Self: Serialize + Sized + SingleFileID,
+    {
+        let name = Self::get_file_id();
+        let mut path = Self::Path::path();
+        if path.exists() == false {
+            create_dir_all(&path)?;
+        }
+        path.push(name);
+        path.set_extension("ron");
+
+        let pretty = ron::ser::PrettyConfig::default();
+        let ser = ron::ser::to_string_pretty(self, pretty)?;
+        write(path, ser.as_bytes())?;
+        Ok(())
+    }
+    fn load_file() -> Result<Self, Error>
+    where
+        Self: DeserializeOwned + SingleFileID,
+    {
+        let mut path = Self::Path::path();
+        let name = Self::get_file_id();
+        path.push(name);
+        path.set_extension("ron");
+
+        let buffer = read(path)?;
+        let r = ron::de::from_bytes::<Self>(&buffer);
+        match r {
+            Ok(o) => Ok(o),
+            Err(e) => Err(e.into()),
+        }
     }
     fn load_path<P>(path: P) -> Result<Self, Error>
     where
@@ -90,7 +123,7 @@ pub trait File {
     }
     fn get_content_drive_path(&self) -> PathBuf
     where
-        Self: ContentID + Sized
+        Self: ContentID + Sized,
     {
         let mut p = Self::Path::path();
         let id = self.get_content_id();
@@ -99,7 +132,7 @@ pub trait File {
     }
     fn get_content_file_path(&self, extension: &str) -> PathBuf
     where
-        Self: ContentID + Sized
+        Self: ContentID + Sized,
     {
         let mut p = self.get_content_drive_path();
         let id = self.get_content_id();
@@ -112,10 +145,14 @@ pub trait File {
 pub trait PathProvider {
     fn path() -> PathBuf;
 }
+pub trait SingleFileID {
+    fn get_file_id() -> &'static str;
+}
 
 pub struct PlaylistPath();
 pub struct VideoPath();
 pub struct ThumbnailPath;
+pub struct SettingsPath;
 
 impl PathProvider for PlaylistPath {
     fn path() -> PathBuf {
@@ -138,6 +175,13 @@ impl PathProvider for ThumbnailPath {
         let mut d = dirs::data_dir().unwrap();
         d.push(PROJECT_NAME);
         d.push("thumbnails");
+        d
+    }
+}
+impl PathProvider for SettingsPath {
+    fn path() -> PathBuf {
+        let mut d = dirs::config_dir().unwrap();
+        d.push(PROJECT_NAME);
         d
     }
 }
