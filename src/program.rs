@@ -1,7 +1,7 @@
 use iced::Theme;
 
 use crate::{
-    data::{Playlist, Video},
+    data::{Playlist, Thumbnail, Video},
     enums::WindowScreen,
     gui::Status,
     service::ServiceProvider,
@@ -23,6 +23,7 @@ pub struct Vidyalog {
 pub struct Database {
     playlists: Vec<Playlist>,
     videos: Vec<Video>,
+    thumbnails: Vec<Thumbnail>,
 }
 
 #[derive(Default)]

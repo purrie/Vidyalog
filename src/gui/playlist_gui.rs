@@ -1,7 +1,7 @@
 use iced::{
     widget::{
         button, column, container, horizontal_rule, horizontal_space, row, scrollable, text,
-        vertical_space, Column,
+        vertical_space, Column, Image,
     },
     Alignment, Element, Length,
 };
@@ -9,16 +9,17 @@ use iced::{
 use crate::{
     data::{Playlist, PlaylistFeed},
     enums::{Message, WindowScreen},
+    program::Database,
     service::ContentID,
 };
 
-use super::{DetailView, ListView, Styles};
+use super::{DetailView, ListView, Styles, THUMBNAIL_SIZE_BIG, THUMBNAIL_SIZE_SMALL};
 
 impl ListView for Vec<Playlist> {
-    fn gui_list_view<'a>(&self) -> Element<'a, Message> {
+    fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let list = Column::with_children(
             self.iter()
-                .map(|x| x.gui_list_view())
+                .map(|x| x.gui_list_view(database))
                 .map(Element::from)
                 .collect(),
         )
@@ -36,10 +37,10 @@ impl ListView for Vec<Playlist> {
 }
 
 impl<'p> ListView for Vec<PlaylistFeed<'p>> {
-    fn gui_list_view<'a>(&self) -> Element<'a, Message> {
+    fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let list = Column::with_children(
             self.iter()
-                .map(|x| x.gui_list_view())
+                .map(|x| x.gui_list_view(database))
                 .map(Element::from)
                 .collect(),
         )
@@ -56,7 +57,7 @@ impl<'p> ListView for Vec<PlaylistFeed<'p>> {
     }
 }
 impl<'p> ListView for PlaylistFeed<'p> {
-    fn gui_list_view<'a>(&self) -> Element<'a, Message> {
+    fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let title = text(&self.playlist.title).size(20);
         let author = text(&self.playlist.author).size(16);
 
@@ -66,45 +67,61 @@ impl<'p> ListView for PlaylistFeed<'p> {
             .on_press(Message::ToggleWatchStatus(self.latest.get_content_id()))
             .style(Styles::ContentFrame.into());
 
-        let ui = column!(
-            title,
+        let mut video: Element<_> = column!(
+            video_title,
             row!(
-                author,
+                video_length,
                 horizontal_space(Length::Units(20)),
-                column!(
-                    vertical_space(Length::Units(4)),
-                    video_title,
-                    row!(
-                        video_length,
-                        horizontal_space(Length::Units(20)),
-                        video_status
-                    )
-                    .align_items(Alignment::Center)
-                )
+                video_status
             )
+            .align_items(Alignment::Center)
         )
-        .width(Length::Fill);
-        let controls = row!(
+        .padding(4)
+        .into();
+        if let Some(th) = database.get_thumbnail_image(&self.latest.thumbnail) {
+            let img = Image::new(th)
+                .content_fit(iced::ContentFit::Fill)
+                .width(Length::Units(THUMBNAIL_SIZE_SMALL.0))
+                .height(Length::Units(THUMBNAIL_SIZE_SMALL.1));
+            video = row!(img, video).padding(4).into();
+        }
+        video = column!(vertical_space(Length::Units(4)), video).into();
+        let mut ui: Element<_> = column!(
+            title,
+            row!(author, horizontal_space(Length::Units(20)), video)
+        )
+        .into();
+        if let Some(th) = database.get_thumbnail_image(&self.playlist.thumbnail) {
+            let img = Image::new(th)
+                .content_fit(iced::ContentFit::Fill)
+                .width(Length::Units(THUMBNAIL_SIZE_SMALL.0))
+                .height(Length::Units(THUMBNAIL_SIZE_SMALL.1));
+            ui = row!(img, ui).spacing(4).into();
+        }
+        let controls = column!(
             button("Details").on_press(Message::OpenScreen(WindowScreen::PlaylistDetail(
                 self.playlist.get_content_id()
             ))),
             button("Continue").on_press(Message::OpenVideoExternally(self.latest.get_content_id()))
         )
         .spacing(4);
-        let content = container(row!(ui, controls).align_items(Alignment::Center))
-            .padding(5)
-            .style(Styles::ContentFrame)
-            .width(Length::Fill)
-            .height(Length::Shrink);
+        let content = container(
+            row!(ui, horizontal_space(Length::Fill), controls).align_items(Alignment::Center),
+        )
+        .padding(5)
+        .style(Styles::ContentFrame)
+        .width(Length::Fill)
+        .height(Length::Shrink);
 
         content.into()
     }
 }
 impl ListView for Playlist {
-    fn gui_list_view<'a>(&self) -> Element<'a, Message> {
+    fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let info = column!(
             text(&self.title).size(20),
             text(&self.author).size(16),
+            vertical_space(Length::Units(4)),
             text(format!("Video count: {}", self.video_count())).size(16)
         )
         .width(Length::Fill);
@@ -122,10 +139,15 @@ impl ListView for Playlist {
         )
         .spacing(4);
 
-        let main = row!(info, controls,)
-            .width(Length::Fill)
-            .spacing(5)
-            .align_items(Alignment::Center);
+        let mut main = row!().width(Length::Fill).height(Length::Shrink).spacing(5);
+        if let Some(th) = database.get_thumbnail_image(&self.thumbnail) {
+            let img = Image::new(th)
+                .content_fit(iced::ContentFit::Fill)
+                .height(Length::Units(THUMBNAIL_SIZE_SMALL.1))
+                .width(Length::Units(THUMBNAIL_SIZE_SMALL.0));
+            main = main.push(img);
+        }
+        let main = main.push(row!(info, controls).align_items(Alignment::Center));
 
         // let col = column!(vertical_space(Length::Units(5)), main, horizontal_rule(1));
         let col = container(main).style(Styles::ContentFrame).padding(5);
@@ -134,7 +156,7 @@ impl ListView for Playlist {
 }
 
 impl DetailView for Playlist {
-    fn gui_detail_view<'a>(&self) -> Element<'a, Message> {
+    fn gui_detail_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let top_box = column!(
             text(&self.title).size(30),
             horizontal_rule(4).style(Styles::Header),
@@ -151,7 +173,15 @@ impl DetailView for Playlist {
         )
         .spacing(4)
         .align_items(Alignment::End);
-        let content = row!(top_box, controls,);
+        let mut content = row!(top_box, controls,).spacing(4);
+
+        if let Some(th) = database.get_thumbnail_image(&self.thumbnail) {
+            let img = Image::new(th)
+                .content_fit(iced::ContentFit::Fill)
+                .height(Length::Units(THUMBNAIL_SIZE_BIG.1))
+                .width(Length::Units(THUMBNAIL_SIZE_BIG.0));
+            content = content.push(img);
+        }
 
         let content = container(content)
             .style(Styles::Header)

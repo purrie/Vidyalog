@@ -16,12 +16,11 @@ pub trait File {
     where
         Self: Serialize + ContentID + Sized,
     {
-        let mut path = Self::Path::path();
-        let id = self.get_content_id();
-        path.push(id.service.get_path_name());
+        let mut path = self.get_content_drive_path();
         if path.exists() == false {
             create_dir_all(&path)?;
         }
+        let id = self.get_content_id();
         path.push(id.id);
         path.set_extension("ron");
 
@@ -89,6 +88,25 @@ pub trait File {
         remove_file(path)?;
         Ok(())
     }
+    fn get_content_drive_path(&self) -> PathBuf
+    where
+        Self: ContentID + Sized
+    {
+        let mut p = Self::Path::path();
+        let id = self.get_content_id();
+        p.push(id.service.get_path_name());
+        p
+    }
+    fn get_content_file_path(&self, extension: &str) -> PathBuf
+    where
+        Self: ContentID + Sized
+    {
+        let mut p = self.get_content_drive_path();
+        let id = self.get_content_id();
+        p.push(id.id);
+        p.set_extension(extension);
+        p
+    }
 }
 
 pub trait PathProvider {
@@ -97,6 +115,7 @@ pub trait PathProvider {
 
 pub struct PlaylistPath();
 pub struct VideoPath();
+pub struct ThumbnailPath;
 
 impl PathProvider for PlaylistPath {
     fn path() -> PathBuf {
@@ -111,6 +130,14 @@ impl PathProvider for VideoPath {
         let mut d = dirs::data_dir().unwrap();
         d.push(PROJECT_NAME);
         d.push("videos");
+        d
+    }
+}
+impl PathProvider for ThumbnailPath {
+    fn path() -> PathBuf {
+        let mut d = dirs::data_dir().unwrap();
+        d.push(PROJECT_NAME);
+        d.push("thumbnails");
         d
     }
 }

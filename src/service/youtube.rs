@@ -1,8 +1,9 @@
+use iced::widget::image;
 use regex::{Captures, Regex};
 
 use crate::{
-    data::{Playlist, Video},
-    enums::{Error, VideoService, VideoStatus},
+    data::{Playlist, Thumbnail, Video},
+    enums::{ContentType, Error, VideoService, VideoStatus},
     web::HTMLDecodable,
 };
 
@@ -22,7 +23,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
         }
         id
     };
-    let url = format!("https://www.youtube.com/playlist?list={}", id);
+    let url = get_playlist_url(&id);
     let res = browser.open(&url).await?;
 
     if res.status() == 200 {
@@ -53,7 +54,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
             .filter(|x| x.contains("ytInitialData"))
             .fold(String::new(), |i, x| format!("{}\n{}", i, x));
 
-        let videos = {
+        let videos: Vec<_> = {
             let mut videos = Vec::new();
             let regex =
                 Regex::new(r#""watchEndpoint":\{"videoId":"(.+?)",.+?"index":(\d+),"#).unwrap();
@@ -68,7 +69,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
             }
             videos
                 .iter()
-                .map(|x| ContentIdentifier::new(&VideoService::Youtube, x))
+                .map(|x| ContentIdentifier::new(&VideoService::Youtube, x, ContentType::Video))
                 .collect()
         };
         let description = {
@@ -87,7 +88,16 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
                 String::from("Unknown Author")
             }
         };
-        // to get the playlist thumbnail, use playlistVideoThumbnailRenderer lookup
+        let thumbnail = {
+            let regex = Regex::new(r#"heroPlaylistThumbnailRenderer":\{"thumbnail":\{"thumbnails":\[\{"url":"https://i.ytimg.com/vi/(.+?)/hqdefault.jpg"#).unwrap();
+            if let Some(c) = regex.captures(&playlist_data) {
+                let id = c.get(1).unwrap().as_str().to_string();
+                ContentIdentifier::new(&VideoService::Youtube, &id, ContentType::Thumbnail)
+            } else {
+                let vid = videos.get(0).unwrap();
+                ContentIdentifier::new(&VideoService::Youtube, &vid.id, ContentType::Thumbnail)
+            }
+        };
         Ok(Playlist {
             id,
             url,
@@ -95,6 +105,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
             videos,
             description,
             author,
+            thumbnail,
             source: VideoService::Youtube,
             tracked: false,
         })
@@ -177,6 +188,7 @@ pub async fn procure_video(browser: BrowserCarrier, url: String) -> Result<Video
         let author = extract_detail!(r#""author":"(.+?)""#, false).decode_html();
 
         Ok(Video {
+            thumbnail: ContentIdentifier::new(&VideoService::Youtube, &id, ContentType::Thumbnail),
             title,
             channel_id,
             id,
@@ -197,6 +209,39 @@ pub async fn procure_video(browser: BrowserCarrier, url: String) -> Result<Video
     }
 }
 
+pub async fn procure_thumbnail(browser: BrowserCarrier, url: String) -> Result<Thumbnail, Error> {
+    let mut browser = browser.lock().await;
+
+    let id = {
+        let regex = Regex::new(r"https://i.ytimg.com/vi/(.+?)/").unwrap();
+        if let Some(c) = regex.captures(&url) {
+            c.get(1).unwrap().as_str().to_string()
+        } else {
+            return Err(Error::InvalidThumbnailURL(url));
+        }
+    };
+
+    let res = browser.open(&url).await?;
+
+    if res.status() == 200 {
+        let bytes = res.bytes().await?;
+        let img = image::Handle::from_memory(bytes.to_vec());
+
+        let th = Thumbnail::new(url, id, VideoService::Youtube).with_image(img);
+        Ok(th)
+    } else {
+        Err(Error::ReqwestError(format!(
+            "Network request failed: {}",
+            res.status()
+        )))
+    }
+}
+pub fn get_playlist_url(id: &str) -> String {
+    format!("https://www.youtube.com/playlist?list={}", id)
+}
 pub fn get_video_url(id: &str) -> String {
     format!("https://www.youtube.com/watch?v={}", id)
+}
+pub fn get_thumbnail_url(id: &str) -> String {
+    format!("https://i.ytimg.com/vi/{}/hqdefault.jpg", id)
 }

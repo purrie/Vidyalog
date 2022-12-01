@@ -1,5 +1,7 @@
+use std::iter::Iterator;
+
 use crate::{
-    data::{Playlist, PlaylistFeed, Video},
+    data::{Playlist, PlaylistFeed, Thumbnail, Video},
     enums::{Error, VideoStatus},
     file::File,
     service::{ContentID, ContentIdentifier},
@@ -11,7 +13,12 @@ impl Default for Database {
     fn default() -> Self {
         let playlists = Playlist::load_all();
         let videos = Video::load_all();
-        Self { playlists, videos }
+        let thumbnails = Thumbnail::load_all();
+        Self {
+            playlists,
+            videos,
+            thumbnails,
+        }
     }
 }
 
@@ -21,6 +28,9 @@ impl Database {
     }
     pub fn video_index(&self, id: &ContentIdentifier<Video>) -> Option<usize> {
         self.videos.iter().position(|x| id.identify(x))
+    }
+    pub fn thumbnail_index(&self, id: &ContentIdentifier<Thumbnail>) -> Option<usize> {
+        self.thumbnails.iter().position(|x| id.identify(x))
     }
     pub fn add_playlist(&mut self, playlist: Playlist) -> Result<(), Error> {
         if let Some(i) = self.playlist_index(&playlist.get_content_id()) {
@@ -118,5 +128,32 @@ impl Database {
         } else {
             Some(v)
         }
+    }
+    pub fn filter_thumbnails_mut<T>(&mut self, pred: T) -> impl Iterator<Item = &mut Thumbnail>
+    where
+        T: FnMut(&&mut Thumbnail) -> bool,
+    {
+        self.thumbnails.iter_mut().filter(pred)
+    }
+    pub fn get_thumbnail_image(
+        &self,
+        id: &ContentIdentifier<Thumbnail>,
+    ) -> Option<iced::widget::image::Handle> {
+        if let Some(i) = self.thumbnail_index(id) {
+            self.thumbnails.get(i).unwrap().get_image()
+        } else {
+            None
+        }
+    }
+    pub fn add_thumbnail(&mut self, thumb: Thumbnail) -> Result<(), Error> {
+        if let Some(i) = self.thumbnail_index(&thumb.get_content_id()) {
+            let t = self.thumbnails.get_mut(i).unwrap();
+            t.update(thumb)?;
+            t.save()?;
+        } else {
+            thumb.save()?;
+            self.thumbnails.push(thumb);
+        }
+        Ok(())
     }
 }

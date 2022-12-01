@@ -20,18 +20,41 @@ impl Application for Vidyalog {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        let app = Vidyalog::default();
-        let updates: Vec<_> = app
+        let mut app = Vidyalog::default();
+        // checking updates for playlists
+        let mut updates: Vec<_> = app
             .data
             .playlists
             .iter()
+            .map(|x| Command::perform(app.web.get_playlist(x.url.clone()), Message::AddPlaylist))
+            .collect();
+        // this both takes care of loading the thumbnails into memory and downloading missing images
+        let mut thumbs: Vec<_> = app
+            .data
+            .filter_thumbnails_mut(|x| x.has_image() == false)
+            .filter_map(|x| match x.load_image() {
+                Ok(_) => None,
+                Err(_) => Some(Command::perform(
+                    app.web.get_thumbnail(x.url.clone()),
+                    Message::AddThumbnail,
+                )),
+            })
+            .collect();
+        updates.append(&mut thumbs);
+        // This will download all thumbnails from videos that are missing thumbnails
+        let mut thumbs: Vec<_> = app
+            .data
+            .videos
+            .iter()
+            .filter(|x| app.data.thumbnail_index(&x.thumbnail) == None)
             .map(|x| {
                 Command::perform(
-                    x.source.get_playlist(app.web.get_browser(), x.url.clone()),
-                    Message::AddPlaylist,
+                    app.web.get_thumbnail(x.thumbnail.get_url()),
+                    Message::AddThumbnail,
                 )
             })
             .collect();
+        updates.append(&mut thumbs);
         let comm = Command::batch(updates);
         (app, comm)
     }
@@ -64,12 +87,7 @@ impl Application for Vidyalog {
                         let missing: Vec<Command<_>> = miss
                             .iter()
                             .map(|x| {
-                                Command::perform(
-                                    playlist
-                                        .source
-                                        .get_video(self.web.get_browser(), x.get_url()),
-                                    Message::AddVideo,
-                                )
+                                Command::perform(self.web.get_video(x.get_url()), Message::AddVideo)
                             })
                             .collect();
                         Command::batch(missing)
@@ -99,10 +117,20 @@ impl Application for Vidyalog {
                 Command::none()
             }
             Message::AddVideo(Ok(video)) => {
+                // schedule downloading the thumbnail if it is missing from the database
+                let com = match self.data.thumbnail_index(&video.thumbnail) {
+                    Some(_) => Command::none(),
+                    None => Command::perform(
+                        self.web.get_thumbnail(video.thumbnail.get_url()),
+                        Message::AddThumbnail,
+                    ),
+                };
+                // add and save the video
                 if let Err(e) = self.data.add_video(video) {
-                    self.status.report(format!("Failed to add or update video: {}", e));
+                    self.status
+                        .report(format!("Failed to add or update video: {}", e));
                 }
-                Command::none()
+                com
             }
             Message::AddVideo(Err(e)) => {
                 println!("{e}");
@@ -158,6 +186,18 @@ impl Application for Vidyalog {
                     self.status
                         .report(format!("Failed to update video {} because {}", pl.title, e));
                 }
+                Command::none()
+            }
+            Message::AddThumbnail(Ok(th)) => {
+                if let Err(e) = self.data.add_thumbnail(th) {
+                    self.status
+                        .report(format!("Failed to add or update thumbnail because {}", e));
+                }
+                Command::none()
+            }
+            Message::AddThumbnail(Err(e)) => {
+                self.status
+                    .report(format!("Failed to retrieve thumbnail because {}", e));
                 Command::none()
             }
         }
@@ -218,7 +258,7 @@ impl Vidyalog {
                 .center_y()
                 .into();
         }
-        let list = pl.gui_list_view();
+        let list = pl.gui_list_view(&self.data);
         list.into()
     }
     fn playlist_tracker_view(&self) -> Element<Message> {
@@ -230,7 +270,7 @@ impl Vidyalog {
             ),
             button("Add").on_press(Message::QueryPlaylist)
         );
-        let list = self.data.playlists.gui_list_view();
+        let list = self.data.playlists.gui_list_view(&self.data);
         column!(bar, list).into()
     }
     fn playlist_detail_view(&self, id: &ContentIdentifier<Playlist>) -> Element<Message> {
@@ -239,8 +279,8 @@ impl Vidyalog {
         };
         let vids = self.data.get_videos_by_id(&pl.videos);
 
-        let detail = pl.gui_detail_view();
-        let video_list = vids.gui_list_view();
+        let detail = pl.gui_detail_view(&self.data);
+        let video_list = vids.gui_list_view(&self.data);
         column!(detail, video_list).into()
     }
 }

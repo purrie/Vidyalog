@@ -12,16 +12,18 @@ ron = "0.8"
 serde = { version = "1", features = ["derive"] }
 htmlentity = "1.2.0"
 open = "3"
+image = "0.24.5"
+iced_native = "0.6.1"
 
 [dependencies.iced]
-version = "0.5"
+version = "0.5.2"
 default-features = false
-features = ["glow", "tokio"]
+features = ["image", "wgpu", "tokio"]
 
 [dev-dependencies.iced]
-version = "0.5"
+version = "0.5.2"
 default-features = false
-features = ["glow", "tokio", "debug"]
+features = ["image", "wgpu", "tokio", "debug"]
 
 [dependencies.reqwest]
 version = "0.11"

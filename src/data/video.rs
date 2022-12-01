@@ -1,6 +1,6 @@
 use crate::{
     file::{File, VideoPath},
-    service::{ContentID, ContentIdentifier},
+    service::{ContentID, ContentIdentifier}, enums::ContentType,
 };
 
 use super::Video;
@@ -13,7 +13,7 @@ impl ContentID for Video {
     where
         Self: Sized,
     {
-        ContentIdentifier::new(&self.source, &self.id)
+        ContentIdentifier::new(&self.source, &self.id, ContentType::Video)
     }
 }
 

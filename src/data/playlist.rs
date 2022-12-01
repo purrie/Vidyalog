@@ -1,4 +1,5 @@
 use crate::{
+    enums::ContentType,
     file::{File, PlaylistPath},
     service::{ContentID, ContentIdentifier},
 };
@@ -28,6 +29,6 @@ impl ContentID for Playlist {
     where
         Self: Sized,
     {
-        ContentIdentifier::new(&self.source, &self.id)
+        ContentIdentifier::new(&self.source, &self.id, ContentType::Playlist)
     }
 }

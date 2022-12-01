@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    data::{Playlist, Video},
+    data::{Playlist, Thumbnail, Video},
     service::ContentIdentifier,
 };
 
@@ -17,6 +17,7 @@ pub enum Message {
     DeletePlaylist(ContentIdentifier<Playlist>),
     AddPlaylist(Result<Playlist, Error>),
     AddVideo(Result<Video, Error>),
+    AddThumbnail(Result<Thumbnail, Error>),
     OpenInBrowser(String),
     OpenVideoExternally(ContentIdentifier<Video>),
     ToggleWatchStatus(ContentIdentifier<Video>),
@@ -39,6 +40,14 @@ pub enum VideoService {
     Unknown,
     Youtube,
 }
+#[derive(Default, Debug, Clone, Deserialize, Serialize, PartialEq)]
+pub enum ContentType {
+    #[default]
+    Invalid,
+    Playlist,
+    Video,
+    Thumbnail,
+}
 #[derive(Default, Debug, Clone, Deserialize)]
 pub enum Error {
     #[default]
@@ -50,9 +59,12 @@ pub enum Error {
     Utf8Error(String),
     InvalidVideoURL(String),
     InvalidPlaylistURL(String),
+    InvalidThumbnailURL(String),
     IncompleteResponse,
     ParsingError(String),
     MissingID(String),
+    ImageError(String),
+    Mismatch(String),
 }
 
 /// Flag for videos to help distinguish watched from new videos.
