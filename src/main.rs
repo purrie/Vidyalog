@@ -17,6 +17,7 @@ mod gui;
 mod service;
 mod web;
 mod program;
+mod icons;
 
 fn main() -> iced::Result {
     Vidyalog::run(Settings::default())

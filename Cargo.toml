@@ -18,12 +18,12 @@ iced_native = "0.6.1"
 [dependencies.iced]
 version = "0.5.2"
 default-features = false
-features = ["image", "wgpu", "tokio"]
+features = ["svg", "image", "wgpu", "tokio"]
 
 [dev-dependencies.iced]
 version = "0.5.2"
 default-features = false
-features = ["image", "wgpu", "tokio", "debug"]
+features = ["svg", "image", "wgpu", "tokio", "debug"]
 
 [dependencies.reqwest]
 version = "0.11"

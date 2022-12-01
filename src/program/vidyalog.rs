@@ -1,5 +1,5 @@
 use iced::{
-    widget::{button, column, container, row, text, text_input, vertical_space},
+    widget::{button, column, container, row, text, text_input, vertical_space, svg},
     Application, Command, Element, Length,
 };
 
@@ -8,7 +8,7 @@ use crate::{
     enums::{Message, VideoStatus, WindowScreen},
     file::File,
     gui::{DetailView, ListView, Styles},
-    service::ContentIdentifier,
+    service::ContentIdentifier, icons,
 };
 
 use super::Vidyalog;
@@ -233,12 +233,18 @@ impl Application for Vidyalog {
 
 impl Vidyalog {
     fn side_bar_view(&self) -> Element<Message> {
+        let cog = svg::Handle::from_memory(icons::COG.as_bytes());
+        let cog = svg(cog);
+        let home = svg::Handle::from_memory(icons::HOME.as_bytes());
+        let home = svg(home);
+        let playlist = svg::Handle::from_memory(icons::PLAYLIST.as_bytes());
+        let playlist = svg(playlist);
         let buttons = column![
-            button("Home").on_press(Message::OpenScreen(WindowScreen::Home)),
-            button("Playlists").on_press(Message::OpenScreen(WindowScreen::PlaylistTracker)),
+            button(home).on_press(Message::OpenScreen(WindowScreen::Home)),
+            button(playlist).on_press(Message::OpenScreen(WindowScreen::PlaylistTracker)),
             vertical_space(Length::Fill),
-            button("Settings").on_press(Message::OpenScreen(WindowScreen::Settings))
-        ];
+            button(cog).on_press(Message::OpenScreen(WindowScreen::Settings))
+        ].spacing(4);
         let content = container(buttons)
             .style(Styles::Header)
             .width(Length::Shrink)
