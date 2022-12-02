@@ -20,12 +20,12 @@ version = "0.5.2"
 default-features = false
 features = ["svg", "image", "wgpu", "tokio"]
 
-[dev-dependencies.iced]
-version = "0.5.2"
-default-features = false
-features = ["svg", "image", "wgpu", "tokio", "debug"]
-
 [dependencies.reqwest]
 version = "0.11"
 default-features = false
-features = ["json", "rustls-tls"]
+features = ["rustls-tls"]
+
+[profile.release]
+lto = true
+opt-level = "s"
+strip = true

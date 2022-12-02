@@ -37,7 +37,7 @@ This would pretty much work like ani-cli but for youtube as is, and with graphic
 ** Other video sites
 Odysee and Rumble among others would be neat addition. One app to watch them all.
 
-* Release target 0.2 [3/6]
+* Release target 0.2 [4/6]
 ** [X] Program [2/2]
 - [X] Thumbnail retriever
 - [X] Tooltips
@@ -49,12 +49,12 @@ Odysee and Rumble among others would be neat addition. One app to watch them all
 - [X] Home icon
 - [X] Playlists icon
 - [X] Settings icon
-** [ ] Build script [0/6]
-- [ ] Build targets (win/nux)
-- [ ] Packaging a windows zip
-- [ ] Packaging a linux tarball with install scripts
-- [ ] Packaging a .deb
-- [ ] Direct install/remove/purge
-- [ ] .desktop file
+** [X] Build script [6/6]
+- [X] Build targets (win/nux)
+- [X] Packaging a windows zip
+- [X] Packaging a linux tarball with install scripts
+- [X] Packaging a .deb
+- [X] Direct install/remove/purge
+- [X] .desktop file
 ** [ ] Code Documentation
 ** [ ] Improve the readme
