@@ -1,4 +1,5 @@
 
+/// Icon for representing a settings screen
 pub const COG: &str = r##"<svg
    width="31.999998"
    height="31.999998"
@@ -22,6 +23,7 @@ pub const COG: &str = r##"<svg
   </g>
 </svg>"##;
 
+/// Icon representing home screen
 pub const HOME: &str = r##"<svg
    width="31.999998"
    height="31.999998"
@@ -124,6 +126,7 @@ pub const HOME: &str = r##"<svg
   </g>
 </svg>"##;
 
+/// Icon representing playlist tracker
 pub const PLAYLIST: &str = r##"<svg
    width="31.999994"
    height="31.999998"

@@ -5,6 +5,7 @@ use crate::enums::{ContentType, VideoService};
 use super::{ContentID, ContentIdentifier};
 
 impl<T> ContentIdentifier<T> {
+    /// Creates a new identifier
     pub fn new(service: &VideoService, id: &str, content: ContentType) -> Self {
         ContentIdentifier {
             service: service.clone(),
@@ -13,6 +14,7 @@ impl<T> ContentIdentifier<T> {
             pd: PhantomData,
         }
     }
+    /// Tests if the content matches this identifier
     pub fn identify(&self, other: &T) -> bool
     where
         T: ContentID,
@@ -20,6 +22,10 @@ impl<T> ContentIdentifier<T> {
         let oc = other.get_content_id();
         oc == *self
     }
+    /// Returns an URL that points to the content
+    ///
+    /// # Error
+    /// If the identifier isn't properly created, it will return "Invalid content type" instead
     pub fn get_url(&self) -> String {
         match &self.content {
             ContentType::Playlist => self.service.get_playlist_url(&self.id),

@@ -16,6 +16,7 @@ use crate::{
 use super::{DetailView, ListView, Styles, THUMBNAIL_SIZE_BIG, THUMBNAIL_SIZE_SMALL};
 
 impl ListView for Vec<Playlist> {
+    /// UI interface for a list of playlists
     fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let list = Column::with_children(
             self.iter()
@@ -37,6 +38,7 @@ impl ListView for Vec<Playlist> {
 }
 
 impl<'p> ListView for Vec<PlaylistFeed<'p>> {
+    /// UI for a list of playlist feeds, showing both a playlist and the first unwatched video in the playlist
     fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let list = Column::with_children(
             self.iter()
@@ -57,6 +59,7 @@ impl<'p> ListView for Vec<PlaylistFeed<'p>> {
     }
 }
 impl<'p> ListView for PlaylistFeed<'p> {
+    /// Creates a line UI displaying the playlist and the first unwatched video in the playlist
     fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let title = text(&self.playlist.title).size(20);
         let author = text(&self.playlist.author).size(16);
@@ -133,6 +136,7 @@ impl<'p> ListView for PlaylistFeed<'p> {
     }
 }
 impl ListView for Playlist {
+    /// UI displaying information about the playlist in a line
     fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let info = column!(
             text(&self.title).size(20),
@@ -196,6 +200,7 @@ impl ListView for Playlist {
 }
 
 impl DetailView for Playlist {
+    /// Creates UI for the playlist header for the detail screen
     fn gui_detail_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let top_box = column!(
             text(&self.title).size(30),

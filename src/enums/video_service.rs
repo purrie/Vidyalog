@@ -12,6 +12,7 @@ impl Display for VideoService {
 }
 
 impl VideoService {
+    /// Used in serialization and deserialization, provides folder name where the files associated with the service should be kept
     pub fn get_path_name(&self) -> String {
         match self {
             VideoService::Unknown => "unknown",

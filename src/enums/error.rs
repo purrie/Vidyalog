@@ -10,7 +10,6 @@ impl Display for Error {
             Error::InvalidVideoURL(u) => write!(f, "{} is not a valid video URL", u),
             Error::InvalidThumbnailURL(url) => write!(f, "{} is not a valid thumbnail URL", url),
             Error::IncompleteResponse => write!(f, "Error: Request response was incomplete"),
-            Error::MissingID(s) => write!(f, "Missing ID error: {}", s),
             Error::Mismatch(info) => write!(f, "Mismatch error: {info}"),
             Error::ReqwestError(e) => write!(f, "{}", e),
             Error::SerializationError(e) => write!(f, "{}", e),

@@ -9,6 +9,7 @@ use crate::{
 
 use super::{BrowserCarrier, ContentIdentifier};
 
+/// Visits the url to grab information about the playlist
 pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Playlist, Error> {
     let mut browser = browser.lock().await;
 
@@ -117,6 +118,7 @@ pub async fn procure_playlist(browser: BrowserCarrier, url: String) -> Result<Pl
     }
 }
 
+/// Visits the url to grab the information about the video
 pub async fn procure_video(browser: BrowserCarrier, url: String) -> Result<Video, Error> {
     let mut browser = browser.lock().await;
 
@@ -209,6 +211,7 @@ pub async fn procure_video(browser: BrowserCarrier, url: String) -> Result<Video
     }
 }
 
+/// Visits the url to grab information about the thumbnail, it will also download the jpg thumbnail file
 pub async fn procure_thumbnail(browser: BrowserCarrier, url: String) -> Result<Thumbnail, Error> {
     let mut browser = browser.lock().await;
 
@@ -236,12 +239,22 @@ pub async fn procure_thumbnail(browser: BrowserCarrier, url: String) -> Result<T
         )))
     }
 }
+
+/// Converts the id into a playlist url
+///
+/// There is no validation as to whatever the returned url is actually a playlist url, the function just formats the string
 pub fn get_playlist_url(id: &str) -> String {
     format!("https://www.youtube.com/playlist?list={}", id)
 }
+/// Converts the id into a video url
+///
+/// There is no validation as to whatever the returned url is actually a video url, the function just formats the string
 pub fn get_video_url(id: &str) -> String {
     format!("https://www.youtube.com/watch?v={}", id)
 }
+/// Converts the id into a thumbnail url pointing to the image file
+///
+/// There is no validation as to whatever the returned url is actually a thumbnail url, the function just formats the string
 pub fn get_thumbnail_url(id: &str) -> String {
     format!("https://i.ytimg.com/vi/{}/hqdefault.jpg", id)
 }

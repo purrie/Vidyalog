@@ -13,6 +13,7 @@ impl Display for VideoStatus {
 }
 
 impl VideoStatus {
+    /// Provides a static string slice that can be used as a label representing the watch status of the video.
     pub fn as_label(&self) -> &'static str {
         match self {
             VideoStatus::Unseen => "Unseen",

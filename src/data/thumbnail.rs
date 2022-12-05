@@ -39,6 +39,9 @@ impl Default for Thumbnail {
     }
 }
 impl Thumbnail {
+    /// Creates a new thumbnail
+    ///
+    /// The image will be None
     pub fn new(url: String, id: String, source: VideoService) -> Thumbnail {
         Self {
             url,
@@ -47,24 +50,34 @@ impl Thumbnail {
             image: None,
         }
     }
+    /// Builds an image into the thumbnail
     pub fn with_image(mut self, img: image::Handle) -> Self {
         self.image = Some(img);
         self
     }
+    /// Tests if the thumbnail has loaded image
     pub fn has_image(&self) -> bool {
         match &self.image {
             Some(_) => true,
             None => false,
         }
     }
+    /// Returns an image handle, or None if it haven't been loaded
     pub fn get_image(&self) -> Option<image::Handle> {
         match &self.image {
             Some(i) => Some(i.clone()),
             None => None,
         }
     }
+    /// Loads the image from the drive
+    ///
+    /// # Errors
+    /// Will error out if the reading or creating the image from the data fails
+    ///
+    /// It will also error if there is no file on the drive
     pub fn load_image(&mut self) -> Result<(), Error> {
-        let path = self.get_content_file_path("jpg");
+        let mut path = self.get_content_file_path();
+        path.set_extension("jpg");
         let f = fs::read(path)?;
         let img = load_from_memory(f.as_bytes())?;
 
@@ -89,11 +102,18 @@ impl Thumbnail {
         self.image = Some(img);
         Ok(())
     }
+    /// Saves loaded image to drive
+    ///
+    /// # Errors
+    /// If the thumbnail doesn't have an image then a serialization error will occur
+    ///
+    /// Error will also occur if saving fails
     pub fn save_image(&self) -> Result<(), Error> {
         if self.has_image() == false {
             return Err(Error::SerializationError("No Image".to_string()));
         }
-        let path = self.get_content_file_path("jpg");
+        let mut path = self.get_content_file_path();
+        path.set_extension("jpg");
         let data = self.image.as_ref().unwrap().data();
 
         let img = match data {
@@ -114,6 +134,12 @@ impl Thumbnail {
         img.save(path)?;
         Ok(())
     }
+    /// Updates the thumbnail with the image
+    ///
+    /// # Errors
+    /// Error will occur if the saving the image fails
+    ///
+    /// Error will also occur if the URLs doesn't match
     pub fn update(&mut self, other: Thumbnail) -> Result<(), Error> {
         if self.url == other.url {
             self.image = other.image;

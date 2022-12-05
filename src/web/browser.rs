@@ -5,6 +5,9 @@ use crate::enums::Error;
 use super::Browser;
 
 impl Browser {
+    /// Sends a get request to the url
+    ///
+    /// It also fills the headers of the request
     pub async fn open(&mut self, url: &str) -> Result<Response, Error> {
         let req = self
             .client
@@ -22,6 +25,7 @@ impl Browser {
 }
 
 impl Default for Browser {
+    /// Creates a default browser
     fn default() -> Self {
         Self {
             cookies: Default::default(),

@@ -7,6 +7,7 @@ use crate::gui::{ListView, Styles};
 use crate::program::Settings;
 
 impl ListView for Settings {
+    /// This is the main UI view for the program settings
     fn gui_list_view<'a>(
         &self,
         _database: &crate::program::Database,
@@ -53,6 +54,7 @@ impl File for Settings {
     type Path = SettingsPath;
 }
 impl Default for Settings {
+    /// By default, Settings struct will load the settings file if it exists, otherwise it will return the default values for its settings
     fn default() -> Self {
         if let Ok(s) = Self::load_file() {
             return s;
@@ -63,7 +65,8 @@ impl Default for Settings {
     }
 }
 impl SingleFileID for Settings {
+    /// Name of the file the settings are stored
     fn get_file_id() -> &'static str {
-        "conf"
+        "config"
     }
 }

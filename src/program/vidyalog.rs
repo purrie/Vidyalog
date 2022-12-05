@@ -19,6 +19,7 @@ impl Application for Vidyalog {
     type Theme = iced::Theme;
     type Flags = ();
 
+    /// Initialization function
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         let mut app = Vidyalog::default();
         // checking updates for playlists
@@ -63,6 +64,7 @@ impl Application for Vidyalog {
         "Vidyalog".to_string()
     }
 
+    /// Event response
     fn update(&mut self, message: Self::Message) -> iced::Command<Self::Message> {
         match message {
             Message::AddPlaylistURL(url) => {
@@ -207,6 +209,7 @@ impl Application for Vidyalog {
         }
     }
 
+    /// UI function
     fn view(&self) -> iced::Element<'_, Self::Message, iced::Renderer<Self::Theme>> {
         let bar = self.side_bar_view();
 
@@ -232,6 +235,7 @@ impl Application for Vidyalog {
 }
 
 impl Vidyalog {
+    /// Creates a side bar with main buttons for switching screens
     fn side_bar_view(&self) -> Element<Message> {
         let cog = svg::Handle::from_memory(icons::COG.as_bytes());
         let cog = svg(cog);
@@ -252,6 +256,7 @@ impl Vidyalog {
             .padding(5);
         content.into()
     }
+    /// Creates UI for the main screen where new and unseen videos are shown
     fn home_view(&self) -> Element<Message> {
         let pl = self.data.get_fresh_playlists();
         if pl.len() == 0 {
@@ -267,6 +272,7 @@ impl Vidyalog {
         let list = pl.gui_list_view(&self.data);
         list.into()
     }
+    /// Creates UI for all the playlists in the database
     fn playlist_tracker_view(&self) -> Element<Message> {
         let bar = row!(
             text_input(
@@ -279,6 +285,7 @@ impl Vidyalog {
         let list = self.data.playlists.gui_list_view(&self.data);
         column!(bar, list).into()
     }
+    /// Creates UI with details about a playlist
     fn playlist_detail_view(&self, id: &ContentIdentifier<Playlist>) -> Element<Message> {
         let Some(pl) = self.data.get_playlist(id) else {
             return text(format!("Playlist id doesn't exist: {}", id)).into();
@@ -289,6 +296,7 @@ impl Vidyalog {
         let video_list = vids.gui_list_view(&self.data);
         column!(detail, video_list).into()
     }
+    /// Creates UI for the settings screen
     fn settings_view(&self) -> Element<Message> {
         self.settings.gui_list_view(&self.data)
     }

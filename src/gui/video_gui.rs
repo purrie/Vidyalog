@@ -16,6 +16,7 @@ use crate::{
 use super::{ListView, Styles, THUMBNAIL_SIZE_SMALL};
 
 impl ListView for Vec<&Video> {
+    /// Creates UI for the list of videos
     fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let ui = self.iter().map(|x| x.gui_list_view(database)).collect();
         let c = Column::with_children(ui)
@@ -35,6 +36,7 @@ impl ListView for Vec<&Video> {
 }
 
 impl ListView for Video {
+    /// Creates UI for a video to be displayed in a line
     fn gui_list_view<'a>(&self, database: &Database) -> Element<'a, Message> {
         let status = row!(
             text(format!("Video length: {}", self.get_length())),

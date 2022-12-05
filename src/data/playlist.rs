@@ -7,11 +7,14 @@ use crate::{
 use super::Playlist;
 
 impl Playlist {
+    /// Returns how many videos are in the playlist
     pub fn video_count(&self) -> usize {
         self.videos.len()
     }
+    /// Updates the playlist with the information from the other playlist
     pub fn update(&mut self, other: Playlist) {
         if self.url != other.url {
+            // TODO return an error
             return;
         }
         self.title = other.title;
