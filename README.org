@@ -1,10 +1,65 @@
 #+title: Vidyalog
 
+* Table of Content :toc:
+- [[#about][About]]
+  - [[#the-problem][The Problem]]
+  - [[#the-solution][The Solution]]
+  - [[#the-state-of-the-program][The State of the Program]]
+- [[#installation][Installation]]
+- [[#building][Building]]
+- [[#contributing][Contributing]]
+- [[#license][License]]
+
 * About
-This is a WIP program designed to make watching Youtube playlists easier. The way I use Youtube, is often focused around watching series that creators put in playlists, yet that part of Youtube is very lacking in features and has terrible UI/UX. There is no feed with new videos when they get added to a playlist, keeping track of them is also horrible as there's no way to filter them, if you save any playlist, it gets dumped into a horrendously long list of every playlist you've ever made or saved. Not to mention other usability issues. And thus, the need for a solution was born, and this program is my attempt at creating the solution for it.
+Vidyalog is designed to help manage Youtube playlists into more coherent and presentable manner than what Youtube interface offers.
+
+** The Problem
+For casual consumption, Youtube interface isn't as bad as people may lead you to believe. However, the problems start appearing once you actually start using it for a few years. Your subscription list grows, saved playlist multiply and you start noticing one particular pattern. You start missing videos you wanted to see from creators you subscribed to. A lot of people are quick to clam youtube is just not pushing new videos into your feed, but I noticed, more often than not, those videos are there, but are just buried under other videos. To fix this, Youtube introduced notifications, which all it did is create a secondary subscription feed that ultimately does nothing to address the issue.
+
+The issue is also compounded by the fact Youtube practically requires creators to make at least a video a day to be successful, which means more mess in your feed as most of the videos will pile up, leaving you with a choice of unsubscribing from creators you only want to see specific content from or letting it bury other videos.
+
+Another problem occurs when you start watching recurring series. Lets plays, tutorial videos, roleplay games. Using the subscribtion feed only works if those are actively ongoing but if you want to follow already completed series, Youtube offers no tools to make that easier. You can save the playlist so you don't lose it but to dig it out, you need to really dig for it as all saved playlists go into the same place with little to no convenient way to access it again, save maybe for leaving the tab with the playlist open and not close it between your browsing sessions.
+
+Outlining the problem, one can easily notice that this is an UI/UX issue that Youtube could easily fix. That is, if they wanted. Goals of Youtube, unfortunately aren't aligned with making Youtube better for viewers, instead, it is to addict you to watching more videos through trending, recommendations, home, shorts pages among other tactics.
+
+** The Solution
+This program is basically a specialized web browser that displays Youtube pages in manner more useful than Youtube's website. The goal is to create UI/UX experience that Youtube refuses to, making it easier to follow old completed and new ongoing series of videos. Follow channels in more coherent manner. Sort content in related categories that you can create and access as you see fit. And maybe in the future, allow viewing Youtube videos directly within it, without needing to open your regular web browser.
+
+** The State of the Program
+Currently Vidyalog is in early alpha stages. It can be used as is with little to no issues, although its features are limited.
+
+At this stage, the program focuses on making playlists easier to watch and manage. It allows you to add playlists to be tracked, and automatically display those that you haven't finished watching, or if a new video has been added to them.
+
+* Installation
+Look to the releases page to get prebuilt binaries. Vidyalog is available for both Windows and GNU/Linux systems.
+
+* Building
+All you need to run build and installation is Cargo and Just.
+#+BEGIN_SRC shell
+cargo install just
+#+END_SRC
+On GNU/Linux you can build and install the program running the following commands:
+#+BEGIN_SRC shell
+just install
+#+END_SRC
+Removal is done with:
+#+BEGIN_SRC shell
+just remove
+#+END_SRC
+Removal will only remove the program, leaving the data intact. If you want to remove everything run this command:
+#+BEGIN_SRC shell
+just purge
+#+END_SRC
+
+To see all the available commands run:
+#+BEGIN_SRC shell
+just -l
+#+END_SRC
 
 * Contributing
-This is an open project and contributions are welcome.
+This is an open project and contributions are welcome. For simple fixes or minor changes, simply fork the project, commit the changes to a new branch and send a PR. For anything bigger, create an issue first to ensure your proposition is within the scope and direction of the project so it can be discussed.
+
+When contributing, please ensure that what you contribute actually complies with the license of the project, which usually means, it should be created by you.
 
 * License
 Vidyalog, The video playlist manager
