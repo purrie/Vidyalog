@@ -96,7 +96,8 @@ impl<'p> ListView for PlaylistFeed<'p> {
         video = column!(vertical_space(Length::Units(4)), video).into();
         let mut ui: Element<_> = column!(
             title,
-            row!(author, horizontal_space(Length::Units(20)), video)
+            author,
+            video,
         )
         .into();
         if let Some(th) = database.get_thumbnail_image(&self.playlist.thumbnail) {
